@@ -17,7 +17,7 @@ export const SearchSection = ({ onSearch, loading }: SearchSectionProps) => {
   const handleSearch = () => {
     onSearch({
       location: location.trim() || undefined,
-      chargerType: chargerType || undefined,
+      chargerType: chargerType && chargerType !== "all" ? chargerType : undefined,
       useGPS: false
     });
   };
@@ -25,7 +25,7 @@ export const SearchSection = ({ onSearch, loading }: SearchSectionProps) => {
   const handleGPSSearch = () => {
     onSearch({
       useGPS: true,
-      chargerType: chargerType || undefined
+      chargerType: chargerType && chargerType !== "all" ? chargerType : undefined
     });
   };
 
@@ -77,7 +77,7 @@ export const SearchSection = ({ onSearch, loading }: SearchSectionProps) => {
                   <SelectValue placeholder="충전기 종류 선택" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">전체</SelectItem>
+                  <SelectItem value="all">전체</SelectItem>
                   <SelectItem value="DC콤보">DC콤보 (급속)</SelectItem>
                   <SelectItem value="AC완속">AC완속</SelectItem>
                   <SelectItem value="CHAdeMO">CHAdeMO</SelectItem>
