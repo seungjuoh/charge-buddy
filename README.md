@@ -1,5 +1,16 @@
 # Welcome to your Lovable project
 
+## 🚀 Quick Start - Run These Commands First!
+
+**Before running and debugging the project, execute these commands in your terminal:**
+
+```bash
+npm install
+npm run dev
+```
+
+---
+
 ## Project info
 
 **URL**: https://lovable.dev/projects/99c3d9e4-92dc-45b1-8618-89754828551e
@@ -71,37 +82,6 @@ If you encounter issues when running the project after cloning from GitHub, try 
 ### 0. **VS Code Path Issues (Important!)**
 If you're using VS Code and encounter extension loading failures or "Extension host terminated unexpectedly" errors, this is likely due to non-English characters in your project path.
 
-**Solution: Move project to English path**
-```bash
-# Windows (PowerShell)
-# Navigate to your Desktop
-cd C:\Users\[YourUsername]\Desktop
-
-# Create new English-named directory
-mkdir ai-project
-
-# Copy project to new location
-Copy-Item -Path "ai프로젝트\charge-buddy-3" -Destination "ai-project\charge-buddy-3" -Recurse
-
-# Navigate to new location
-cd ai-project\charge-buddy-3
-
-# Open VS Code from new location
-code .
-```
-
-**Alternative: Use short path**
-```bash
-# Create a symbolic link with English name
-mklink /D C:\ai-project C:\Users\[YourUsername]\Desktop\ai프로젝트\charge-buddy-3
-
-# Then work from C:\ai-project
-```
-
-**Why this happens:**
-- VS Code extensions can fail to load when project paths contain non-English characters
-- This is a known issue with VS Code and various extensions
-- Moving to an English path resolves most extension-related problems
 
 ### 1. **Dependencies Installation Issues**
 ```bash
