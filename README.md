@@ -36,6 +36,69 @@ npm i
 npm run dev
 ```
 
+## Troubleshooting Guide
+
+If you encounter issues when running the project after cloning from GitHub, try these solutions:
+
+### 1. **Dependencies Installation Issues**
+```bash
+# Clear npm cache and reinstall
+npm cache clean --force
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### 2. **Port Already in Use**
+```bash
+# Check if port 8080 is in use
+netstat -ano | findstr :8080
+
+# Kill the process using the port (Windows)
+taskkill /PID <PID_NUMBER> /F
+
+# Or use a different port by modifying vite.config.ts
+```
+
+### 3. **Node.js Version Issues**
+```bash
+# Check your Node.js version
+node --version
+
+# This project works with Node.js 16+ and npm 8+
+# If you have an older version, update Node.js
+```
+
+### 4. **Windows-Specific Issues**
+```bash
+# If you get 'vite' is not recognized error:
+# Make sure you're in the project directory and run:
+npm install
+npm run dev
+
+# If PowerShell execution policy blocks scripts:
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
+### 5. **Firewall/Antivirus Issues**
+- Temporarily disable Windows Defender or antivirus
+- Add the project folder to antivirus exclusions
+- Check Windows Firewall settings
+
+### 6. **Alternative Port Configuration**
+If port 8080 doesn't work, the server will automatically try port 5173. You can also manually change the port in `vite.config.ts`:
+
+```typescript
+server: {
+  port: 3000, // Change to any available port
+  open: true,
+}
+```
+
+### 7. **Development Server Access**
+Once running, the server will be available at:
+- http://localhost:8080/ (default)
+- http://localhost:5173/ (fallback)
+
 **Edit a file directly in GitHub**
 
 - Navigate to the desired file(s).
