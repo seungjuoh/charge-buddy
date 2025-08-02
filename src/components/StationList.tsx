@@ -43,9 +43,9 @@ export const StationList = ({ stations, loading, onToggleFavorite }: StationList
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {stations.map((station) => (
+        {stations.map((station, index) => (
           <StationCard
-            key={station.id}
+            key={`${station.id}-${station.latitude}-${station.longitude}-${index}`}
             station={station}
             onToggleFavorite={onToggleFavorite}
           />

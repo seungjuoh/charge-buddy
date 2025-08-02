@@ -175,20 +175,23 @@ const getChargersFromKemco = async (zcode: string, zscode: string, pageNo: numbe
         return [];
       }
 
-      const mappedData = Array.from(items).map((item: any) => ({
-        statId: item.querySelector("statId")?.textContent || "N/A",
-        statNm: item.querySelector("statNm")?.textContent || "이름 없음",
-        addr: item.querySelector("addr")?.textContent || "주소 없음",
-        addrDetail: item.querySelector("addrDetail")?.textContent || "",
-        location: item.querySelector("location")?.textContent || "",
-        lat: item.querySelector("lat")?.textContent || "N/A",
-        lng: item.querySelector("lng")?.textContent || "N/A",
-        useTime: item.querySelector("useTime")?.textContent || "정보 없음",
-        busiNm: item.querySelector("busiNm")?.textContent || "운영기관 없음",
-        output: item.querySelector("output")?.textContent || "N/A",
-        chgerType: item.querySelector("chgerType")?.textContent || "N/A",
-        stat: item.querySelector("stat")?.textContent || "N/A"
-      }));
+             const mappedData = Array.from(items).map((item: any) => ({
+         statId: item.querySelector("statId")?.textContent || "N/A",
+         statNm: item.querySelector("statNm")?.textContent || "이름 없음",
+         addr: item.querySelector("addr")?.textContent || "주소 없음",
+         addrDetail: item.querySelector("addrDetail")?.textContent || "",
+         location: item.querySelector("location")?.textContent || "",
+         lat: item.querySelector("lat")?.textContent || "N/A",
+         lng: item.querySelector("lng")?.textContent || "N/A",
+         useTime: item.querySelector("useTime")?.textContent || "정보 없음",
+         busiNm: item.querySelector("busiNm")?.textContent || "운영기관 없음",
+         output: item.querySelector("output")?.textContent || "N/A",
+         chgerType: item.querySelector("chgerType")?.textContent || "N/A",
+         stat: item.querySelector("stat")?.textContent || "N/A"
+       }))
+       .filter((item: any, index: number, self: any[]) => 
+         index === self.findIndex((s: any) => s.statId === item.statId)
+       );
       
       console.log(`[한국환경공단 API] 충전소 ${mappedData.length}개 조회 성공`);
       return mappedData;
@@ -374,13 +377,20 @@ export const useStations = () => {
 
       console.log(`[검색] 거리 계산 완료: ${stationsWithDistance.length}개`);
 
-      // 10km 이내만 필터링
-      const filteredStations = stationsWithDistance
-        .filter((station: any) => station.distance <= 10)
-        .map((station: any) => ({
-          ...station,
-          reviews: [] // 실제 API에서는 후기 데이터가 없으므로 빈 배열
-        }));
+             // 10km 이내만 필터링하고 중복 제거
+       const filteredStations = stationsWithDistance
+         .filter((station: any) => station.distance <= 10)
+         .map((station: any) => ({
+           ...station,
+           reviews: [] // 실제 API에서는 후기 데이터가 없으므로 빈 배열
+         }))
+         .reduce((unique: any[], station: any) => {
+           const exists = unique.find((s: any) => s.id === station.id);
+           if (!exists) {
+             unique.push(station);
+           }
+           return unique;
+         }, []);
 
       console.log(`[검색] 10km 이내 필터링 완료: ${filteredStations.length}개`);
       console.log(`[검색] 최종 결과:`, filteredStations);
