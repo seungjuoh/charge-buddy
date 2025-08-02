@@ -22,6 +22,29 @@ The only requirement is having Node.js & npm installed - [install with nvm](http
 
 Follow these steps:
 
+### Option 1: Auto-Setup Scripts (Recommended)
+
+**Windows Users:**
+```bash
+# Double-click run.bat or run in Command Prompt:
+run.bat
+```
+
+**PowerShell Users:**
+```powershell
+# Run in PowerShell:
+.\run.ps1
+```
+
+**Unix/Linux/macOS Users:**
+```bash
+# Make executable and run:
+chmod +x run.sh
+./run.sh
+```
+
+### Option 2: Manual Setup
+
 ```sh
 # Step 1: Clone the repository using the project's Git URL.
 git clone <YOUR_GIT_URL>
@@ -34,6 +57,11 @@ npm i
 
 # Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
+```
+
+### Option 3: One-Command Setup
+```bash
+npm run setup
 ```
 
 ## Troubleshooting Guide
