@@ -10,6 +10,10 @@ export interface ChargingStation {
   longitude: number;
   isFavorite?: boolean;
   reviews?: Review[];
+  // API 데이터 추가 필드
+  distance?: number;
+  status?: string;
+  businessName?: string;
 }
 
 export interface Review {
@@ -23,6 +27,6 @@ export interface Review {
 
 export interface SearchParams {
   location?: string;
-  useGPS?: boolean;
   chargerType?: string;
+  useGPS?: boolean;
 }

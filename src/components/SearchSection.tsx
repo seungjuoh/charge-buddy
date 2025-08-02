@@ -1,16 +1,18 @@
 import { useState } from "react";
-import { Search, MapPin, Filter } from "lucide-react";
+import { Search, MapPin, Filter, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { SearchParams } from "@/types/station";
 
 interface SearchSectionProps {
   onSearch: (params: SearchParams) => void;
   loading: boolean;
+  error?: string | null;
 }
 
-export const SearchSection = ({ onSearch, loading }: SearchSectionProps) => {
+export const SearchSection = ({ onSearch, loading, error }: SearchSectionProps) => {
   const [location, setLocation] = useState("");
   const [chargerType, setChargerType] = useState("");
 
@@ -44,6 +46,14 @@ export const SearchSection = ({ onSearch, loading }: SearchSectionProps) => {
         </p>
       </div>
 
+      {/* 에러 메시지 표시 */}
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
       <div className="bg-card rounded-lg p-6 shadow-lg border">
         <div className="space-y-4">
           {/* 검색창 */}
@@ -51,37 +61,40 @@ export const SearchSection = ({ onSearch, loading }: SearchSectionProps) => {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
-                placeholder="서울 강남구에 급속 충전소 있어?"
+                placeholder="서울교대, 강남구, 서초구 등 지역명을 입력하세요"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 onKeyPress={handleKeyPress}
                 className="pl-10"
+                disabled={loading}
               />
             </div>
             <Button 
               onClick={handleSearch} 
-              disabled={loading}
+              disabled={loading || !location.trim()}
               className="px-6"
             >
               <Search className="h-4 w-4 mr-2" />
-              검색
+              {loading ? "검색 중..." : "검색"}
             </Button>
           </div>
 
           {/* 필터 및 GPS 검색 */}
           <div className="flex gap-3 items-center">
             <div className="flex-1">
-              <Select value={chargerType} onValueChange={setChargerType}>
+              <Select value={chargerType} onValueChange={setChargerType} disabled={loading}>
                 <SelectTrigger>
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="충전기 종류 선택" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">전체</SelectItem>
-                  <SelectItem value="DC콤보">DC콤보 (급속)</SelectItem>
-                  <SelectItem value="AC완속">AC완속</SelectItem>
-                  <SelectItem value="CHAdeMO">CHAdeMO</SelectItem>
-                  <SelectItem value="Tesla">Tesla 슈퍼차저</SelectItem>
+                  <SelectItem value="DC콤보">DC콤보</SelectItem>
+                  <SelectItem value="DC차데모">DC차데모</SelectItem>
+                  <SelectItem value="AC3상">AC3상</SelectItem>
+                  <SelectItem value="B타입">B타입(5핀)</SelectItem>
+                  <SelectItem value="C타입">C타입(5핀)</SelectItem>
+                  <SelectItem value="BC타입">BC타입</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -92,7 +105,7 @@ export const SearchSection = ({ onSearch, loading }: SearchSectionProps) => {
               className="px-6"
             >
               <MapPin className="h-4 w-4 mr-2" />
-              내 주변 찾기
+              {loading ? "위치 확인 중..." : "내 주변 찾기"}
             </Button>
           </div>
         </div>

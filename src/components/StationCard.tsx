@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MapPin, Clock, Car, Heart, Star, ExternalLink, MessageSquare } from "lucide-react";
+import { MapPin, Clock, Car, Heart, Star, ExternalLink, MessageSquare, Navigation, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -36,6 +36,13 @@ export const StationCard = ({ station, onToggleFavorite }: StationCardProps) => 
     return "outline";
   };
 
+  const getStatusBadgeVariant = (status: string) => {
+    if (status.includes("충전가능")) return "default";
+    if (status.includes("충전중")) return "secondary";
+    if (status.includes("고장") || status.includes("점검")) return "destructive";
+    return "outline";
+  };
+
   return (
     <>
       <Card className="hover:shadow-lg transition-shadow duration-200">
@@ -62,6 +69,31 @@ export const StationCard = ({ station, onToggleFavorite }: StationCardProps) => 
         </CardHeader>
 
         <CardContent className="space-y-4">
+          {/* 거리 정보 */}
+          {station.distance !== undefined && (
+            <div className="flex items-center gap-2 text-sm">
+              <Navigation className="h-4 w-4 text-muted-foreground" />
+              <span className="text-muted-foreground">거리:</span>
+              <span className="font-medium">{station.distance.toFixed(1)}km</span>
+            </div>
+          )}
+
+          {/* 상태 정보 */}
+          {station.status && (
+            <div className="space-y-2">
+              <div className="flex items-center text-sm font-medium">
+                <Activity className="h-4 w-4 mr-1" />
+                <span>상태</span>
+              </div>
+              <Badge 
+                variant={getStatusBadgeVariant(station.status)}
+                className="text-xs"
+              >
+                {station.status}
+              </Badge>
+            </div>
+          )}
+
           {/* 충전기 종류 */}
           <div className="space-y-2">
             <div className="flex items-center text-sm font-medium">
@@ -98,6 +130,14 @@ export const StationCard = ({ station, onToggleFavorite }: StationCardProps) => 
               }
             </span>
           </div>
+
+          {/* 운영기관 */}
+          {station.businessName && (
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground">운영기관:</span>
+              <span className="font-medium">{station.businessName}</span>
+            </div>
+          )}
 
           {/* 후기 */}
           {station.reviews && station.reviews.length > 0 && (

@@ -8,6 +8,14 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    proxy: {
+      '/api': {
+        target: 'https://infuser.odcloud.kr',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
+    }
   },
   plugins: [
     react(),
