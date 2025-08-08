@@ -2,6 +2,7 @@ import { useState } from "react";
 import { SearchSection } from "@/components/SearchSection";
 import { StationList } from "@/components/StationList";
 import { Navigation } from "@/components/Navigation";
+import { ChargerChatbot } from "@/components/ChargerChatbot";
 import { useStations } from "@/hooks/useStations";
 import { SearchParams } from "@/types/station";
 
@@ -30,6 +31,8 @@ const Index = () => {
           />
         )}
       </div>
+
+      <ChargerChatbot />
     </div>
   );
 };
