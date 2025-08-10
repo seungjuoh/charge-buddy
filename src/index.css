@@ -108,3 +108,19 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* src/index.css 파일에 추가 */
+@keyframes explode {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+.explode {
+  animation: explode 0.3s ease-out forwards;
+}
