@@ -219,10 +219,44 @@ const statMap: { [key: string]: string } = {
 };
 
 export const useStations = () => {
-  const [stations, setStations] = useState<ChargingStation[]>([]);
+  const [stations, setStationsState] = useState<ChargingStation[]>([]);
   const [favorites, setFavorites] = useState<ChargingStation[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Initialize favorites from localStorage
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("favorites");
+      if (raw) {
+        const parsed: ChargingStation[] = JSON.parse(raw);
+        setFavorites(parsed);
+      }
+    } catch (e) {
+      console.warn("Failed to parse favorites from localStorage", e);
+    }
+  }, []);
+
+  // Persist favorites on change
+  useEffect(() => {
+    try {
+      localStorage.setItem("favorites", JSON.stringify(favorites));
+      // Also reflect favorite flags in the current stations list
+      if (stations && stations.length) {
+        const favIds = new Set(favorites.map((f) => f.id));
+        setStationsState((prev) => prev.map((s) => ({ ...s, isFavorite: favIds.has(s.id) })));
+      }
+    } catch (e) {
+      console.warn("Failed to save favorites to localStorage", e);
+    }
+  }, [favorites]);
+
+  // Exposed setter that syncs favorite flags when results are set from outside
+  const setStations = (list: ChargingStation[]) => {
+    const favIds = new Set(favorites.map((f) => f.id));
+    const withFlags = list.map((s) => ({ ...s, isFavorite: favIds.has(s.id) }));
+    setStationsState(withFlags);
+  };
 
   // 실제 API를 사용한 검색
   const searchStations = async (params: SearchParams): Promise<ChargingStation[]> => {
@@ -377,20 +411,20 @@ export const useStations = () => {
 
       console.log(`[검색] 거리 계산 완료: ${stationsWithDistance.length}개`);
 
-             // 10km 이내만 필터링하고 중복 제거
-       const filteredStations = stationsWithDistance
-         .filter((station: any) => station.distance <= 10)
-         .map((station: any) => ({
-           ...station,
-           reviews: [] // 실제 API에서는 후기 데이터가 없으므로 빈 배열
-         }))
-         .reduce((unique: any[], station: any) => {
-           const exists = unique.find((s: any) => s.id === station.id);
-           if (!exists) {
-             unique.push(station);
-           }
-           return unique;
-         }, []);
+      // 10km 이내만 필터링하고 중복 제거
+      const filteredStations = stationsWithDistance
+        .filter((station: any) => station.distance <= 10)
+        .map((station: any) => ({
+          ...station,
+          reviews: [] // 실제 API에서는 후기 데이터가 없으므로 빈 배열
+        }))
+        .reduce((unique: any[], station: any) => {
+          const exists = unique.find((s: any) => s.id === station.id);
+          if (!exists) {
+            unique.push(station);
+          }
+          return unique;
+        }, []);
 
       console.log(`[검색] 10km 이내 필터링 완료: ${filteredStations.length}개`);
       console.log(`[검색] 최종 결과:`, filteredStations);
@@ -411,27 +445,23 @@ export const useStations = () => {
 
   const addToFavorites = (station: ChargingStation) => {
     const updatedStation = { ...station, isFavorite: true };
-    setFavorites(prev => {
-      if (prev.find(fav => fav.id === station.id)) {
+    setFavorites((prev) => {
+      if (prev.find((fav) => fav.id === station.id)) {
         return prev;
       }
       return [...prev, updatedStation];
     });
-    
-    setStations(prev => 
-      prev.map(s => s.id === station.id ? updatedStation : s)
-    );
+
+    setStationsState((prev) => prev.map((s) => (s.id === station.id ? updatedStation : s)));
   };
 
   const removeFromFavorites = (stationId: string) => {
-    setFavorites(prev => prev.filter(fav => fav.id !== stationId));
-    setStations(prev => 
-      prev.map(s => s.id === stationId ? { ...s, isFavorite: false } : s)
-    );
+    setFavorites((prev) => prev.filter((fav) => fav.id !== stationId));
+    setStationsState((prev) => prev.map((s) => (s.id === stationId ? { ...s, isFavorite: false } : s)));
   };
 
   const toggleFavorite = (station: ChargingStation) => {
-    if (station.isFavorite || favorites.find(fav => fav.id === station.id)) {
+    if (station.isFavorite || favorites.find((fav) => fav.id === station.id)) {
       removeFromFavorites(station.id);
     } else {
       addToFavorites(station);
@@ -445,6 +475,6 @@ export const useStations = () => {
     loading,
     error,
     searchStations,
-    toggleFavorite
+    toggleFavorite,
   };
 };

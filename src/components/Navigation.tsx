@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Search, Heart, Moon, Sun } from "lucide-react";
+import { Search, Heart, Moon, Sun, CloudSun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 
@@ -31,6 +31,17 @@ export const Navigation = () => {
               >
                 <Search className="h-4 w-4" />
                 검색
+              </Button>
+            </Link>
+            
+            <Link to="/weather">
+              <Button 
+                variant={isActive('/weather') ? "default" : "ghost"} 
+                size="sm"
+                className="gap-2"
+              >
+                <CloudSun className="h-4 w-4" />
+                날씨
               </Button>
             </Link>
             
