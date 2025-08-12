@@ -1,73 +1,37 @@
-import { Link, useLocation } from "react-router-dom";
-import { Search, Heart, Moon, Sun, CloudSun } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "next-themes";
+import { Badge } from "@/components/ui/badge";
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 export const Navigation = () => {
-  const location = useLocation();
-  const { theme, setTheme } = useTheme();
-
-  const isActive = (path: string) => location.pathname === path;
-
   return (
     <nav className="bg-card border-b sticky top-0 z-50">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* 로고 */}
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">EV</span>
-            </div>
-            <span className="font-bold text-lg">충전소 찾기</span>
-          </Link>
-
-          {/* 네비게이션 메뉴 */}
-          <div className="flex items-center gap-2">
-            <Link to="/">
-              <Button 
-                variant={isActive('/') ? "default" : "ghost"} 
-                size="sm"
-                className="gap-2"
-              >
-                <Search className="h-4 w-4" />
-                검색
+        <div className="flex items-center justify-start h-16">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="메뉴 열기">
+                <Menu className="h-5 w-5" />
               </Button>
-            </Link>
-            
-            <Link to="/weather">
-              <Button 
-                variant={isActive('/weather') ? "default" : "ghost"} 
-                size="sm"
-                className="gap-2"
-              >
-                <CloudSun className="h-4 w-4" />
-                날씨
-              </Button>
-            </Link>
-            
-            <Link to="/favorites">
-              <Button 
-                variant={isActive('/favorites') ? "default" : "ghost"} 
-                size="sm"
-                className="gap-2"
-              >
-                <Heart className="h-4 w-4" />
-                즐겨찾기
-              </Button>
-            </Link>
-
-            {/* 다크 모드 토글 */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="ml-2"
-            >
-              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span className="sr-only">테마 변경</span>
-            </Button>
-          </div>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-64">
+              <SheetHeader>
+                <SheetTitle>메뉴</SheetTitle>
+              </SheetHeader>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link to="/weather" aria-label="날씨 페이지로 이동">
+                  <Badge className="cursor-pointer px-3 py-1">날씨</Badge>
+                </Link>
+                <Link to="/favorites" aria-label="즐겨찾기 페이지로 이동">
+                  <Badge className="cursor-pointer px-3 py-1">즐겨찾기</Badge>
+                </Link>
+                <Link to="/rates" aria-label="충전요금 비교 페이지로 이동">
+                  <Badge className="cursor-pointer px-3 py-1">충전요금 비교</Badge>
+                </Link>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </div>
     </nav>

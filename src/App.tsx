@@ -9,6 +9,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "@/pages/Index";
 import Favorites from "@/pages/Favorites";
 import Weather from "@/pages/Weather";
+import Rates from "@/pages/Rates";
 import NotFound from "@/pages/NotFound";
 
 // ## ErrorBoundary 컴포넌트를 import 합니다. ##
@@ -32,6 +33,7 @@ const App = () => {
                 <Route path="/" element={<Index />} />
                 <Route path="/favorites" element={<Favorites />} />
                 <Route path="/weather" element={<Weather />} />
+                <Route path="/rates" element={<Rates />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
