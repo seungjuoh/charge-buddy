@@ -3,7 +3,7 @@ import { SearchSection } from "@/components/SearchSection";
 import { StationList } from "@/components/StationList";
 import { Navigation } from "@/components/Navigation";
 import { ChargerChatbot } from "@/components/ChargerChatbot";
-import { ChargingRateWidget } from "@/components/ChargingRateWidget";
+
 import { useStations } from "@/hooks/useStations";
 import { SearchParams } from "@/types/station";
 
@@ -24,10 +24,6 @@ const Index = () => {
       <div className="container mx-auto px-4 py-8 space-y-8">
         <SearchSection onSearch={handleSearch} loading={loading} error={error} />
         
-        {/* 충전 요금 비교 위젯 */}
-        <div className="max-w-2xl">
-          <ChargingRateWidget />
-        </div>
         
         {hasSearched && (
           <StationList 
