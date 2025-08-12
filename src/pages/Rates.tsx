@@ -25,14 +25,7 @@ const Rates = () => {
         </div>
       </header>
       <main className="container mx-auto px-4 py-8">
-        <Card className="max-w-2xl">
-          <CardHeader>
-            <CardTitle>요금 비교 위젯</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ChargingRateWidget />
-          </CardContent>
-        </Card>
+          <ChargingRateWidget />
       </main>
     </div>
   );

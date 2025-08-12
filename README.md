@@ -7,6 +7,8 @@
 ```bash
 npm install
 npm run dev
+npm install papaparse
+npm install --save-dev @types/papaparse
 ```
 
 ---
