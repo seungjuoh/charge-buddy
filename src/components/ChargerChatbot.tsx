@@ -46,31 +46,64 @@ export const ChargerChatbot = () => {
 
     setIsAnalyzing(true);
     try {
-      const formData = new FormData();
-      formData.append('image', selectedImage);
+      // Step 1: OCR - Extract text from image
+      const ocrFormData = new FormData();
+      ocrFormData.append('document', selectedImage);
+      ocrFormData.append('model', 'ocr');
 
-      const response = await fetch('https://lhvqxqzdhshrmvtcpdhi.supabase.co/functions/v1/analyze-charger-error', {
+      const ocrResponse = await fetch('https://api.upstage.ai/v1/document-digitization', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxodnF4cXpkaHNocm12dGNwZGhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQzNDE1MDQsImV4cCI6MjA0OTkxNzUwNH0.1YTbbaELz7Q3y-1tNp1mAi0-rIY8Tm6CnWPYWNUiHLE`,
+          'Authorization': 'Bearer up_4RHT7fYWAXqFsrDFjXkFVD1HbaH6Z',
         },
-        body: formData,
+        body: ocrFormData,
       });
 
-      const data = await response.json();
+      const ocrResult = await ocrResponse.json();
+      const extractedText = ocrResult.text || '';
 
-      if (data.success) {
-        setResult({
-          extractedText: data.extractedText,
-          solution: data.solution,
-        });
-        toast({
-          title: "분석 완료",
-          description: "충전기 오류를 분석했습니다.",
-        });
-      } else {
-        throw new Error(data.error || '분석 중 오류가 발생했습니다.');
-      }
+      // Step 2: AI Analysis using Solar Pro2
+      const aiResponse = await fetch('https://api.upstage.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer up_4RHT7fYWAXqFsrDFjXkFVD1HbaH6Z',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'solar-pro2',
+          messages: [
+            {
+              role: 'user',
+              content: `You are an AI assistant that helps users solve electric vehicle (EV) charger issues. 
+The following text was extracted from a photo of an EV charger error or manual:
+
+"""${extractedText}"""
+
+Identify the issue, summarize it, and suggest an actionable solution in Korean.
+If possible, include the specific cause (if mentioned) and suggest the next steps.
+Format your response in a clear, user-friendly way with:
+1. 오류 요약 (Error Summary)
+2. 원인 분석 (Cause Analysis) 
+3. 해결 방법 (Solution Steps)
+4. 추가 조치 (Additional Actions if needed)`
+            }
+          ],
+          stream: false
+        }),
+      });
+
+      const aiResult = await aiResponse.json();
+      const solution = aiResult.choices?.[0]?.message?.content || '분석 결과를 가져올 수 없습니다.';
+
+      setResult({
+        extractedText,
+        solution,
+      });
+      
+      toast({
+        title: "분석 완료",
+        description: "충전기 오류를 분석했습니다.",
+      });
     } catch (error) {
       console.error('Analysis error:', error);
       toast({
