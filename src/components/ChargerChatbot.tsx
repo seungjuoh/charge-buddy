@@ -49,8 +49,11 @@ export const ChargerChatbot = () => {
       const formData = new FormData();
       formData.append('image', selectedImage);
 
-      const response = await fetch('/functions/v1/analyze-charger-error', {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-charger-error`, {
         method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
         body: formData,
       });
 
