@@ -49,10 +49,10 @@ export const ChargerChatbot = () => {
       const formData = new FormData();
       formData.append('image', selectedImage);
 
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/analyze-charger-error`, {
+      const response = await fetch('https://lhvqxqzdhshrmvtcpdhi.supabase.co/functions/v1/analyze-charger-error', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxodnF4cXpkaHNocm12dGNwZGhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQzNDE1MDQsImV4cCI6MjA0OTkxNzUwNH0.1YTbbaELz7Q3y-1tNp1mAi0-rIY8Tm6CnWPYWNUiHLE`,
         },
         body: formData,
       });
