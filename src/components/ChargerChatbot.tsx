@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,6 +31,13 @@ export const ChargerChatbot = () => {
       }
       setSelectedImage(file);
       setResult(null);
+    }
+  };
+
+  const triggerFileInput = () => {
+    const fileInput = document.getElementById('image-upload') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
     }
   };
 
@@ -108,18 +116,17 @@ export const ChargerChatbot = () => {
                       JPG, PNG 파일 (최대 10MB)
                     </p>
                   </div>
-                  <label htmlFor="image-upload">
-                    <Button variant="outline" className="cursor-pointer">
-                      <Camera className="h-4 w-4 mr-2" />
-                      사진 선택
-                    </Button>
-                  </label>
+                  <Button variant="outline" onClick={triggerFileInput} className="cursor-pointer">
+                    <Camera className="h-4 w-4 mr-2" />
+                    사진 선택
+                  </Button>
                   <input
                     id="image-upload"
                     type="file"
                     accept="image/*"
                     onChange={handleImageSelect}
                     className="hidden"
+                    style={{ display: 'none' }}
                   />
                 </CardContent>
               </Card>
