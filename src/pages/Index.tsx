@@ -34,7 +34,9 @@ const Index = () => {
         )}
       </div>
 
-      <ChargerChatbot />
+      <div className="fixed bottom-8 right-8 z-50">
+        <ChargerChatbot />
+      </div>
     </div>
   );
 };

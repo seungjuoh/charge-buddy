@@ -466,9 +466,6 @@ export const ChargingRateWidget = () => {
         )}
         
         <div className="mt-4 pt-3 border-t">
-          <p className="text-xs text-muted-foreground text-center">
-            * 요금은 사업자별로 상이할 수 있으며, 실시간으로 업데이트됩니다.
-          </p>
           <p className="text-xs text-muted-foreground text-center mt-1">
             * 데이터 기준일: 2025-08-12
           </p>

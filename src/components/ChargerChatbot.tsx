@@ -127,7 +127,7 @@ Format your response in a clear, user-friendly way with:
         <DialogTrigger asChild>
           <Button
             size="icon"
-            className="fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-lg bg-primary hover:bg-primary/90 z-50"
+            className="fixed bottom-20 right-6 w-14 h-14 rounded-full shadow-lg bg-blue-600 hover:bg-blue-700 z-50"
           >
             <MessageCircle className="h-6 w-6" />
           </Button>
