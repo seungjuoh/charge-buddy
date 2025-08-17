@@ -1,17 +1,85 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, Zap, Clock, DollarSign } from "lucide-react";
+import { TrendingUp, Zap, Clock, DollarSign, Filter } from "lucide-react";
 import { ChargingRateWidget } from "@/components/ChargingRateWidget";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
 
 export const PriceChart = () => {
+  const [selectedProvider, setSelectedProvider] = useState("all");
+  const [selectedRegion, setSelectedRegion] = useState("all");
+  const [selectedSpeed, setSelectedSpeed] = useState("all");
+
   return (
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold">충전 요금 시세</h2>
         <p className="text-muted-foreground">전기차 충전 요금 정보를 확인해보세요</p>
       </div>
+      {/* 필터 섹션 */}
+      <Card>
+        <CardHeader>
+          <CardTitle>필터 옵션</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-3">
+            <div className="flex-1 min-w-[120px]">
+              <Select value={selectedProvider} onValueChange={setSelectedProvider}>
+                <SelectTrigger className="h-9">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="사업자명" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체</SelectItem>
+                  <SelectItem value="kep">한전 KDN</SelectItem>
+                  <SelectItem value="gs">GS칼텍스</SelectItem>
+                  <SelectItem value="sk">SK엔카</SelectItem>
+                  <SelectItem value="hyundai">현대오일뱅크</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-      {/* 실시간 충전 요금 비교 - 확대된 버전 */}
-      <ChargingRateWidget />
+            <div className="flex-1 min-w-[120px]">
+              <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+                <SelectTrigger className="h-9">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="지역" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체 지역</SelectItem>
+                  <SelectItem value="seoul">서울시</SelectItem>
+                  <SelectItem value="busan">부산시</SelectItem>
+                  <SelectItem value="incheon">인천시</SelectItem>
+                  <SelectItem value="daegu">대구시</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex-1 min-w-[120px]">
+              <Select value={selectedSpeed} onValueChange={setSelectedSpeed}>
+                <SelectTrigger className="h-9">
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="충전 속도" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">전체</SelectItem>
+                  <SelectItem value="fast">급속</SelectItem>
+                  <SelectItem value="slow">완속</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 상세 요금 비교 */}
+      <Card>
+        <CardHeader>
+          <CardTitle>상세 요금 비교</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ChargingRateWidget />
+        </CardContent>
+      </Card>
 
       {/* 요약 정보 카드들 */}
       <div className="grid gap-4 md:grid-cols-2">

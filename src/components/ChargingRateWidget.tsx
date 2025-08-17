@@ -22,33 +22,13 @@ export const ChargingRateWidget = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showMemberPrice, setShowMemberPrice] = useState(true);
   const [sortBy, setSortBy] = useState<"provider" | "price_asc" | "price_desc">("price_asc");
-  const [selectedProvider, setSelectedProvider] = useState("all");
-  const [selectedSpeed, setSelectedSpeed] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  // 다크모드 감지
-  useEffect(() => {
-    const checkDarkMode = () => {
-      const isDark = document.documentElement.classList.contains('dark') || 
-                     window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setIsDarkMode(isDark);
-    };
-
-    checkDarkMode();
-    
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    mediaQuery.addEventListener('change', checkDarkMode);
-    
-    const observer = new MutationObserver(checkDarkMode);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-
-    return () => {
-      mediaQuery.removeEventListener('change', checkDarkMode);
-      observer.disconnect();
-    };
-  }, []);
+  const [stats, setStats] = useState({
+      minRate: 0,
+      maxRate: 0,
+      avgRate: 0,
+  })
 
   useEffect(() => {
     const loadCSVData = async () => {
@@ -264,64 +244,40 @@ export const ChargingRateWidget = () => {
   // 검색이나 필터 변경시 첫 페이지로 이동
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, showMemberPrice, sortBy, selectedProvider, selectedSpeed, itemsPerPage]);
+  }, [searchTerm, showMemberPrice, sortBy, itemsPerPage]);
 
   const getTrendIcon = (trend: string) => {
-    const baseClasses = "h-4 w-4";
     switch (trend) {
       case "up":
-        return <TrendingUp className={`${baseClasses} ${isDarkMode ? 'text-red-400' : 'text-red-500'}`} />;
+        return <TrendingUp className="h-4 w-4 text-red-500" />;
       case "down":
-        return <TrendingDown className={`${baseClasses} ${isDarkMode ? 'text-blue-400' : 'text-green-500'}`} />;
+        return <TrendingDown className="h-4 w-4 text-green-500" />;
       default:
-        return <span className={`${baseClasses} ${isDarkMode ? 'text-gray-400' : 'text-muted-foreground'}`}>—</span>;
+        return <span className="h-4 w-4 text-muted-foreground">—</span>;
     }
   };
 
   const getTrendColor = (trend: string) => {
     switch (trend) {
       case "up":
-        return isDarkMode ? "text-red-400" : "text-red-600";
+        return "text-red-600";
       case "down":
-        return isDarkMode ? "text-blue-400" : "text-blue-600";
+        return "text-green-600";
       default:
-        return isDarkMode ? "text-gray-400" : "text-muted-foreground";
+        return "text-muted-foreground";
     }
   };
 
-  // 필터링 로직
-  const filteredRates = rates.filter(rate => {
-    // 검색어 필터
-    if (!rate.provider.toLowerCase().includes(searchTerm.toLowerCase())) {
-      return false;
-    }
-    
-    // 사업자명 필터
-    if (selectedProvider !== "all" && rate.provider !== selectedProvider) {
-      return false;
-    }
-    
-    // 충전속도 필터
-    if (selectedSpeed !== "all") {
-      if (selectedSpeed === "fast" && rate.fastCharging <= 0) {
-        return false;
-      }
-      if (selectedSpeed === "slow" && rate.slowCharging <= 0) {
-        return false;
-      }
-    }
-    
-    return true;
-  });
+  // 검색 필터링
+  const filteredRates = rates.filter(rate => 
+    rate.provider.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // 페이징 계산
   const totalPages = Math.ceil(filteredRates.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const displayRates = filteredRates.slice(startIndex, endIndex);
-
-  // 사업자 목록 생성 (동적)
-  const availableProviders = Array.from(new Set(rates.map(r => r.provider))).sort();
 
   // 페이지 번호 배열 생성
   const getPageNumbers = () => {
@@ -345,16 +301,16 @@ export const ChargingRateWidget = () => {
     return (
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className={`flex items-center gap-2 ${isDarkMode ? 'text-green-400' : 'text-primary'}`}>
-            <Zap className="h-5 w-5" />
-            실시간 충전 요금 비교
+          <CardTitle className="flex items-center gap-2">
+            <Zap className="h-5 w-5 text-primary" />
+            충전 요금 시세
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="animate-pulse">
-                <div className={`h-16 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-muted'}`}></div>
+                <div className="h-16 bg-muted rounded-lg"></div>
               </div>
             ))}
           </div>
@@ -366,168 +322,86 @@ export const ChargingRateWidget = () => {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className={`flex items-center gap-2 text-xl md:text-2xl font-bold ${isDarkMode ? 'text-green-400' : 'text-primary'}`}>
-          <Zap className="h-6 w-6 md:h-7 md:w-7" />
+        <CardTitle className="flex items-center gap-2">
+          <Zap className="h-5 w-5 text-primary" />
           실시간 충전 요금 비교
         </CardTitle>
-        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-muted-foreground'}`}>(원/kWh)</p>
+        <p className="text-sm text-muted-foreground">(원/kWh)</p>
         
-        {/* 통합된 필터 섹션 - 반응형 */}
-        <div className="mt-6 space-y-4">
-          {/* 검색창 */}
-          <div className="relative">
-            <Search className={`absolute left-3 top-2.5 h-4 w-4 ${isDarkMode ? 'text-gray-400' : 'text-muted-foreground'}`} />
-            <input
-              type="text"
-              placeholder="사업자명 검색..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className={`w-full pl-10 pr-3 py-2 text-sm rounded-md transition-colors ${
-                isDarkMode 
-                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:bg-gray-600 focus:border-green-400' 
-                  : 'bg-background border-border focus:border-primary'
-              }`}
-            />
-          </div>
-          
-          {/* 필터 옵션들 - 반응형 그리드 */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {/* 충전속도 */}
-            <div className="space-y-1">
-              <label className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                충전속도
-              </label>
-              <select
-                value={selectedSpeed}
-                onChange={(e) => setSelectedSpeed(e.target.value)}
-                className={`w-full px-2 py-2 text-xs md:text-sm rounded-md transition-colors ${
-                  isDarkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600' 
-                    : 'bg-background border-border hover:bg-accent/50'
-                }`}
-              >
-                <option value="all">전체</option>
-                <option value="fast">급속</option>
-                <option value="slow">완속</option>
-              </select>
+        {/* 필터 및 검색 */}
+        <div className="mt-4 space-y-3">
+          <div className="flex flex-col gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="충전소 검색..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-8 pr-3 py-2 text-sm border rounded-md bg-background"
+              />
             </div>
-
-            {/* 회원가 */}
-            <div className="space-y-1">
-              <label className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                회원가
-              </label>
+            
+            <div className="flex gap-2">
               <select
                 value={showMemberPrice ? "member" : "nonmember"}
                 onChange={(e) => setShowMemberPrice(e.target.value === "member")}
-                className={`w-full px-2 py-2 text-xs md:text-sm rounded-md transition-colors ${
-                  isDarkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600' 
-                    : 'bg-background border-border hover:bg-accent/50'
-                }`}
+                className="flex-1 px-3 py-2 text-sm border rounded-md bg-background"
               >
                 <option value="member">회원가</option>
                 <option value="nonmember">비회원가</option>
               </select>
-            </div>
-
-            {/* 사업자명 (새로 추가) */}
-            <div className="space-y-1">
-              <label className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                사업자명
-              </label>
-              <select
-                value={selectedProvider}
-                onChange={(e) => setSelectedProvider(e.target.value)}
-                className={`w-full px-2 py-2 text-xs md:text-sm rounded-md transition-colors ${
-                  isDarkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600' 
-                    : 'bg-background border-border hover:bg-accent/50'
-                }`}
-              >
-                <option value="all">전체</option>
-                {availableProviders.map(provider => (
-                  <option key={provider} value={provider}>{provider}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* 가격 순 */}
-            <div className="space-y-1">
-              <label className={`text-xs font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                가격 순
-              </label>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as "provider" | "price_asc" | "price_desc")}
-                className={`w-full px-2 py-2 text-xs md:text-sm rounded-md transition-colors ${
-                  isDarkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600' 
-                    : 'bg-background border-border hover:bg-accent/50'
-                }`}
+                className="flex-1 px-3 py-2 text-sm border rounded-md bg-background"
               >
                 <option value="price_asc">낮은 가격 순</option>
                 <option value="price_desc">높은 가격 순</option>
                 <option value="provider">이름순</option>
               </select>
+              <select
+                value={itemsPerPage}
+                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                className="px-3 py-2 text-sm border rounded-md bg-background"
+              >
+                <option value={10}>10개씩</option>
+                <option value={20}>20개씩</option>
+                <option value={50}>50개씩</option>
+              </select>
             </div>
           </div>
-
-          {/* 결과 정보 및 표시 개수 */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <div className={`flex items-center gap-2 text-xs ${isDarkMode ? 'text-gray-400' : 'text-muted-foreground'}`}>
-              <Filter className="h-3 w-3" />
-              <span>총 {filteredRates.length}개 사업자</span>
-              {filteredRates.length > 0 && (
-                <span>• {startIndex + 1}-{Math.min(endIndex, filteredRates.length)} 표시</span>
-              )}
-            </div>
-            
-            <select
-              value={itemsPerPage}
-              onChange={(e) => setItemsPerPage(Number(e.target.value))}
-              className={`w-fit px-2 py-1 text-xs rounded-md transition-colors ${
-                isDarkMode 
-                  ? 'bg-gray-700 border-gray-600 text-white hover:bg-gray-600' 
-                  : 'bg-background border-border hover:bg-accent/50'
-              }`}
-            >
-              <option value={10}>10개씩</option>
-              <option value={20}>20개씩</option>
-              <option value={50}>50개씩</option>
-            </select>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Filter className="h-3 w-3" />
+            <span>총 {filteredRates.length}개 충전사업자</span>
+            {filteredRates.length > 0 && (
+              <span>• {startIndex + 1}-{Math.min(endIndex, filteredRates.length)} 표시</span>
+            )}
           </div>
         </div>
       </CardHeader>
-      
       <CardContent>
         <div className="space-y-3">
           {displayRates.map((rate, index) => (
             <div
               key={`${rate.provider}-${index}`}
-              className={`flex items-center justify-between p-3 md:p-4 rounded-lg border transition-all hover:shadow-md ${
-                isDarkMode 
-                  ? 'bg-gray-700 hover:bg-gray-600 border-gray-600' 
-                  : 'bg-card hover:bg-accent/50 border-border'
-              }`}
+              className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
             >
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className={`font-medium text-sm md:text-base ${isDarkMode ? 'text-white' : 'text-foreground'}`}>
-                    {rate.provider}
-                  </span>
+                  <span className="font-medium">{rate.provider}</span>
                   {startIndex + index === 0 && sortBy === "price_asc" && (
-                    <Badge variant="secondary" className={`text-xs ${isDarkMode ? 'bg-green-600 text-white' : ''}`}>
+                    <Badge variant="secondary" className="text-xs">
                       최저가
                     </Badge>
                   )}
                   {startIndex + index === 0 && sortBy === "price_desc" && (
-                    <Badge variant="secondary" className={`text-xs ${isDarkMode ? 'bg-red-600 text-white' : ''}`}>
+                    <Badge variant="secondary" className="text-xs">
                       최고가
                     </Badge>
                   )}
                 </div>
-                <div className={`flex flex-wrap items-center gap-3 text-xs md:text-sm ${isDarkMode ? 'text-gray-200' : 'text-muted-foreground'}`}>
+                <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Zap className="h-3 w-3" />
                     급속: {rate.fastCharging > 0 ? `${rate.fastCharging.toFixed(1)}원` : '정보없음'}
@@ -549,7 +423,7 @@ export const ChargingRateWidget = () => {
         </div>
         
         {displayRates.length === 0 && (
-          <div className={`text-center py-8 ${isDarkMode ? 'text-gray-400' : 'text-muted-foreground'}`}>
+          <div className="text-center py-8 text-muted-foreground">
             <p>검색 결과가 없습니다.</p>
           </div>
         )}
@@ -560,11 +434,7 @@ export const ChargingRateWidget = () => {
             <button
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className={`flex items-center gap-1 px-3 py-2 text-sm border rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                isDarkMode 
-                  ? 'bg-gray-700 hover:bg-gray-600 border-gray-600 text-white disabled:bg-gray-800' 
-                  : 'bg-background hover:bg-accent border-border'
-              }`}
+              className="flex items-center gap-1 px-3 py-2 text-sm border rounded-md bg-background hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="h-4 w-4" />
               이전
@@ -574,14 +444,10 @@ export const ChargingRateWidget = () => {
               <button
                 key={pageNum}
                 onClick={() => setCurrentPage(pageNum)}
-                className={`px-3 py-2 text-sm border rounded-md transition-colors ${
+                className={`px-3 py-2 text-sm border rounded-md ${
                   currentPage === pageNum
-                    ? isDarkMode 
-                      ? 'bg-green-600 text-white border-green-600' 
-                      : 'bg-primary text-primary-foreground border-primary'
-                    : isDarkMode 
-                      ? 'bg-gray-700 hover:bg-gray-600 border-gray-600 text-white' 
-                      : 'bg-background hover:bg-accent border-border'
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-background hover:bg-accent'
                 }`}
               >
                 {pageNum}
@@ -591,11 +457,7 @@ export const ChargingRateWidget = () => {
             <button
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
-              className={`flex items-center gap-1 px-3 py-2 text-sm border rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-                isDarkMode 
-                  ? 'bg-gray-700 hover:bg-gray-600 border-gray-600 text-white disabled:bg-gray-800' 
-                  : 'bg-background hover:bg-accent border-border'
-              }`}
+              className="flex items-center gap-1 px-3 py-2 text-sm border rounded-md bg-background hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
             >
               다음
               <ChevronRight className="h-4 w-4" />
@@ -603,8 +465,8 @@ export const ChargingRateWidget = () => {
           </div>
         )}
         
-        <div className={`mt-4 pt-3 border-t ${isDarkMode ? 'border-gray-600' : 'border-border'}`}>
-          <p className={`text-xs text-center mt-1 ${isDarkMode ? 'text-gray-400' : 'text-muted-foreground'}`}>
+        <div className="mt-4 pt-3 border-t">
+          <p className="text-xs text-muted-foreground text-center mt-1">
             * 데이터 기준일: 2025-08-12
           </p>
         </div>
