@@ -94,20 +94,20 @@ export const OCRScanner = () => {
       <CardContent className="space-y-3">
         <div className="grid grid-cols-2 gap-3 text-sm">
           <div>
-            <span className="text-gray-600">충전기 ID</span>
-            <p className="font-medium">{ocrResult?.data.chargerId}</p>
+            <span className="text-muted-foreground">충전기 ID</span>
+            <p className="font-medium text-foreground">{ocrResult?.data.chargerId}</p>
           </div>
           <div>
-            <span className="text-gray-600">에러 코드</span>
-            <p className="font-medium text-red-600">{ocrResult?.data.errorCode}</p>
+            <span className="text-muted-foreground">에러 코드</span>
+            <p className="font-medium text-destructive">{ocrResult?.data.errorCode}</p>
           </div>
           <div className="col-span-2">
-            <span className="text-gray-600">에러 메시지</span>
-            <p className="font-medium">{ocrResult?.data.errorMessage}</p>
+            <span className="text-muted-foreground">에러 메시지</span>
+            <p className="font-medium text-foreground">{ocrResult?.data.errorMessage}</p>
           </div>
           <div className="col-span-2">
-            <span className="text-gray-600">위치</span>
-            <p className="font-medium">{ocrResult?.data.location}</p>
+            <span className="text-muted-foreground">위치</span>
+            <p className="font-medium text-foreground">{ocrResult?.data.location}</p>
           </div>
         </div>
         <Alert>
@@ -315,8 +315,8 @@ Format your response in a clear, user-friendly way with:
   return (
     <div className="space-y-4">
       <div className="text-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">OCR 스캔</h2>
-        <p className="text-sm text-gray-600">사진을 촬영하여 정보를 자동으로 인식합니다</p>
+        <h2 className="text-xl font-semibold text-foreground mb-2">OCR 스캔</h2>
+        <p className="text-sm text-muted-foreground">사진을 촬영하여 정보를 자동으로 인식합니다</p>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -342,7 +342,7 @@ Format your response in a clear, user-friendly way with:
                 <AlertTriangle className="w-5 h-5 text-red-500" />
                 충전기 고장 신고
               </CardTitle>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 고장난 충전기나 파손된 시설물을 촬영하면 충전기 번호와 에러메시지를 자동으로 인식합니다.
               </p>
             </CardHeader>
@@ -409,7 +409,7 @@ Format your response in a clear, user-friendly way with:
                 <Car className="w-5 h-5 text-blue-500" />
                 차량 정보 등록
               </CardTitle>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 차량등록증, 번호판, 보험증을 촬영하면 차량 정보를 자동으로 입력합니다.
               </p>
             </CardHeader>
@@ -476,7 +476,7 @@ Format your response in a clear, user-friendly way with:
                 <Receipt className="w-5 h-5 text-green-500" />
                 영수증 자동 기록
               </CardTitle>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 충전 영수증을 촬영하면 충전 정보를 자동으로 가계부에 기록합니다.
               </p>
             </CardHeader>
@@ -543,7 +543,7 @@ Format your response in a clear, user-friendly way with:
                 <Camera className="w-5 h-5 text-500" />
                 충전기 오류 해결 도우미
               </CardTitle>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 충전기 오류 화면 사진을 업로드 하세요. 
               </p>
               <p className="text-xs text-muted-foreground mt-1">

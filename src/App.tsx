@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MapPin, MessageCircle, Camera, TrendingUp, Zap, Menu, Heart} from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { ChargingStationSearch } from "@/components/ChargingStationSearch";
 import { ChatBot } from "@/components/ChatBot";
 import { OCRScanner } from "@/components/OCRScanner";
@@ -59,18 +60,21 @@ const App = () => {
                       <div className="flex items-center justify-between max-w-md mx-auto">
                         <div className="flex items-center gap-2">
                           <Zap className="w-6 h-6 text-blue-600" />
-                          <span className="font-semibold text-gray-900">전기차 충전 AI 비서</span>
+                          <span className="font-semibold text-foreground">전기차 충전 AI 비서</span>
                         </div>
-                        <Sheet>
-                          <SheetTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <Menu className="w-5 h-5" />
-                            </Button>
-                          </SheetTrigger>
-                          <SheetContent side="right" className="w-72 p-0">
-                            <Lnb />
-                          </SheetContent>
-                        </Sheet>
+                        <div className="flex items-center gap-2">
+                          <ThemeToggle />
+                          <Sheet>
+                            <SheetTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <Menu className="w-5 h-5" />
+                              </Button>
+                            </SheetTrigger>
+                            <SheetContent side="right" className="w-72 p-0">
+                              <Lnb />
+                            </SheetContent>
+                           </Sheet>
+                        </div>
                       </div>
                     </header>
                     
