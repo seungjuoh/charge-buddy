@@ -29,4 +29,6 @@ export interface SearchParams {
   location?: string;
   chargerType?: string;
   useGPS?: boolean;
+  isNaturalLanguageQuery?: boolean;  // 추가
+  originalQuery?: string;           // 추가     
 }
