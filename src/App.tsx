@@ -56,7 +56,7 @@ const App = () => {
                 <Route path="/" element={
                   <div className="min-h-screen bg-background">
                     {/* Header */}
-                    <header className="bg-white shadow-sm border-b px-4 py-3">
+                    <header className="bg-background shadow-sm border-b px-4 py-3">
                       <div className="flex items-center justify-between max-w-md mx-auto">
                         <div className="flex items-center gap-2">
                           <Zap className="w-6 h-6 text-blue-600" />
@@ -98,7 +98,7 @@ const App = () => {
                         </TabsContent>
 
                         {/* Bottom Navigation */}
-                        <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+                        <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-gray-200">
                           <div className="max-w-md mx-auto">
                             <TabsList className="grid w-full grid-cols-4 bg-transparent h-16">
                               <TabsTrigger 

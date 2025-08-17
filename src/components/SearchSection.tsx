@@ -171,7 +171,7 @@ export const SearchSection = ({ onSearch, loading, error }: SearchSectionProps) 
               className="px-6"
             >
               <MapPin className="h-4 w-4 mr-2" />
-              {loading ? "위치 확인 중..." : "주변 찾기"}
+              {loading ? "위치 확인 중..." : "내 주변"}
             </Button>
           </div>
         </div>
