@@ -54,7 +54,7 @@ export const SearchSection = ({ onSearch, loading, error }: SearchSectionProps) 
     try {
       setGeminiLoading(true);
       
-      const GEMINI_API_KEY = process.env.REACT_APP_GEMINI_API_KEY || 'YOUR_GEMINI_API_KEY';
+      const GEMINI_API_KEY = process.env.REACT_APP_GEMINI_API_KEY || 'AIzaSyBbaSFTol8-NcwlBH0wPCG96rUPcOpGuLw';
       
       const prompt = `
 당신은 전기차 충전소 검색 쿼리를 분석하는 AI입니다. 다음 사용자 입력을 분석하고 JSON 형식으로 응답해주세요:
@@ -326,7 +326,7 @@ export const SearchSection = ({ onSearch, loading, error }: SearchSectionProps) 
 
     // 자연어 질문 패턴 감지
     const naturalLanguagePatterns = [
-      /알려줘|알려주세요|찾아줘|찾아주세요|어디|있나요|보여줘/,
+      /찾아줘|알려줘|알려주세요|찾아줘|찾아주세요|어디|있나요|보여줘/,
       /근처|주변|가까운|인근/,
       /급속|완속|빠른|느린/,
       /충전소|충전기|스테이션/
@@ -522,7 +522,7 @@ export const SearchSection = ({ onSearch, loading, error }: SearchSectionProps) 
               className="px-6"
             >
               <MapPin className="h-4 w-4 mr-2" />
-              {loading ? "위치 확인 중..." : "주변 찾기"}
+              {loading || geminiLoading ? "처리 중..." : "주변 찾기"}
             </Button>
           </div>
 
