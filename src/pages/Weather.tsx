@@ -1,5 +1,4 @@
 // src/pages/Weather.tsx
-
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,27 +7,11 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Input } from "@/components/ui/input";
 import { Loader2, MapPin, Thermometer, Wind, Droplets, CloudLightning, Cloud, CloudRain, Snowflake, Sun } from "lucide-react";
 
-// 중요: 실제 서비스 시에는 본인의 유효한 API 키로 교체해야 합니다.
 const API_KEY = "007c18845252dd0bb2c2777507fd2941";
 
-// ## 1. 한글-영문 도시 이름 변환을 위한 객체 추가 ##
-// 여기에 원하는 도시를 계속 추가할 수 있습니다.
 const KOREAN_CITY_MAP: { [key: string]: string } = {
-  "서울": "Seoul",
-  "부산": "Busan",
-  "인천": "Incheon",
-  "대구": "Daegu",
-  "광주": "Gwangju",
-  "대전": "Daejeon",
-  "울산": "Ulsan",
-  "수원": "Suwon",
-  "성남": "Seongnam",
-  "고양": "Goyang",
-  "용인": "Yongin",
-  "제주": "Jeju",
-  "세종": "Sejong",
+  "서울": "Seoul", "부산": "Busan", "인천": "Incheon", "대구": "Daegu", "광주": "Gwangju", "대전": "Daejeon", "울산": "Ulsan", "수원": "Suwon", "성남": "Seongnam", "고양": "Goyang", "용인": "Yongin", "제주": "Jeju", "세종": "Sejong",
 };
-
 
 interface WeatherData {
   name: string;
@@ -57,12 +40,10 @@ const saveScoreToStorage = (score: number) => {
 };
 
 const Weather = () => {
-  const [city, setCity] = useState("서울"); // 기본값을 한글로 변경
+  const [city, setCity] = useState("서울");
   const [data, setData] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // ... (Game states and other hooks remain the same) ...
   const [boltClicks, setBoltClicks] = useState(0);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [gameActive, setGameActive] = useState(false);
@@ -72,24 +53,17 @@ const Weather = () => {
   const [renderTicker, setRenderTicker] = useState(0);
   const [explodingBolt, setExplodingBolt] = useState<number | null>(null);
 
-  const timerRef = useRef<number | null>(null);
-
   useEffect(() => {
     document.title = "날씨 대시보드 | EV 충전소";
   }, []);
 
-  // ## 2. fetchByCity 함수에 한글 변환 로직 추가 ##
   const fetchByCity = async (q: string) => {
-    // 입력값의 양쪽 공백을 제거합니다.
     const trimmedQuery = q.trim();
     if (!trimmedQuery) return;
-
     setLoading(true);
     setError(null);
     try {
-      // 한글 도시명인지 확인하고, 맞다면 영문으로 변환합니다. 아니면 원래 입력값을 사용합니다.
       const cityToFetch = KOREAN_CITY_MAP[trimmedQuery] || trimmedQuery;
-      
       const url = `${OWM_BASE}?q=${encodeURIComponent(cityToFetch)}&appid=${API_KEY}&units=metric&lang=kr`;
       const res = await fetch(url);
       if (!res.ok) {
@@ -138,10 +112,8 @@ const Weather = () => {
 
   useEffect(() => {
     fetchByCity(city);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ... (The rest of the component code is the same as the last version) ...
   const conditionMain = data?.weather?.[0]?.main || "";
   const temp = data?.main?.temp ?? null;
 
@@ -152,22 +124,16 @@ const Weather = () => {
     if (typeof temp === "number" && temp <= -5) return "한파 조심하세요! ❄️";
     return null;
   }, [conditionMain, temp]);
-  
+
   const WeatherIcon = useMemo(() => {
     switch (conditionMain) {
-      case "Clear":
-        return <Sun className="h-8 w-8 text-yellow-400" />;
-      case "Clouds":
-        return <Cloud className="h-8 w-8 text-slate-400" />;
+      case "Clear": return <Sun className="h-8 w-8 text-yellow-400" />;
+      case "Clouds": return <Cloud className="h-8 w-8 text-slate-400" />;
       case "Rain":
-      case "Drizzle":
-        return <CloudRain className="h-8 w-8 text-blue-400" />;
-      case "Snow":
-        return <Snowflake className="h-8 w-8 text-sky-300" />;
-      case "Thunderstorm":
-        return <CloudLightning className="h-8 w-8 text-yellow-400" />;
-      default:
-        return <Wind className="h-8 w-8 text-gray-500" />;
+      case "Drizzle": return <CloudRain className="h-8 w-8 text-blue-400" />;
+      case "Snow": return <Snowflake className="h-8 w-8 text-sky-300" />;
+      case "Thunderstorm": return <CloudLightning className="h-8 w-8 text-yellow-400" />;
+      default: return <Wind className="h-8 w-8 text-gray-500" />;
     }
   }, [conditionMain]);
 
@@ -182,7 +148,7 @@ const Weather = () => {
     })),
     [renderTicker]
   );
-  
+
   useEffect(() => {
     let intervalId: number | null = null;
     if (showBolts && !gameOverInfo) {
@@ -195,15 +161,18 @@ const Weather = () => {
     };
   }, [showBolts, gameOverInfo]);
 
-  const handleBoltClick = () => {
+  const handleBoltClick = (index: number) => {
     const next = boltClicks + 1;
     setBoltClicks(next);
+    setExplodingBolt(index);
+    setTimeout(() => setExplodingBolt(null), 300);
+    
     if (next >= 5) {
       setBoltClicks(0);
       setConfirmOpen(true);
     }
   };
-  
+
   const handleGameBoltClick = (index: number) => {
     if (!gameActive) return;
     setScore(s => s + 1);
@@ -211,26 +180,38 @@ const Weather = () => {
     setTimeout(() => setExplodingBolt(null), 300);
   };
 
+  // --- 👾 게임 로직 수정 ---
+  // startGame 함수는 이제 게임 상태만 초기화합니다.
   const startGame = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
     setConfirmOpen(false);
-    setGameActive(true);
     setScore(0);
     setTimeLeft(15);
-
-    timerRef.current = window.setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          if (timerRef.current) clearInterval(timerRef.current);
-          setGameActive(false);
-          const { rank } = saveScoreToStorage(score);
-          setGameOverInfo({ score, rank });
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    setGameOverInfo(null);
+    setGameActive(true);
   };
+  
+  // 타이머와 게임 종료 로직을 useEffect로 분리하여 Stale Closure 문제를 해결합니다.
+  useEffect(() => {
+    // 게임이 활성화 상태가 아니거나 시간이 없으면 타이머를 실행하지 않습니다.
+    if (!gameActive || timeLeft <= 0) {
+      // 게임이 끝나는 시점을 정확히 확인 (활성 상태였고 시간이 0이 된 경우)
+      if (gameActive && timeLeft <= 0) {
+        setGameActive(false);
+        // 이 시점의 score는 항상 최신 상태이므로 올바르게 저장됩니다.
+        const { rank } = saveScoreToStorage(score);
+        setGameOverInfo({ score, rank });
+      }
+      return;
+    }
+
+    // 1초마다 timeLeft를 1씩 감소시키는 타이머 설정
+    const timerId = setInterval(() => {
+      setTimeLeft(t => t - 1);
+    }, 1000);
+
+    // 컴포넌트가 unmount되거나 의존성 배열의 값이 바뀔 때 타이머를 정리합니다.
+    return () => clearInterval(timerId);
+  }, [gameActive, timeLeft, score]); // score를 의존성에 추가하여 최신 값을 보장
 
   const retryGame = () => {
     setGameOverInfo(null);
@@ -282,7 +263,7 @@ const Weather = () => {
 
               {loading && !error && (
                 <div className="flex items-center justify-center p-6">
-                   <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                 </div>
               )}
 
@@ -318,7 +299,16 @@ const Weather = () => {
           <section className="relative min-h-[200px] rounded-lg border bg-card p-4 overflow-hidden">
             {!gameActive && !gameOverInfo && <p className="text-sm text-muted-foreground mb-2">비가 오면 번개가 칩니다! ⚡ 번개를 5번 연속 클릭하면 게임이 시작됩니다.</p>}
             {randomPositions.map((pos, idx) => (
-              <button key={idx} onClick={gameActive ? () => handleGameBoltClick(idx) : handleBoltClick} className={`absolute select-none text-2xl transition-transform ${explodingBolt === idx ? 'explode' : 'hover:scale-125'}`} style={{ top: `${pos.top}%`, left: `${pos.left}%`, transform: `scale(${pos.scale})` }} aria-label="lightning-bolt" disabled={!!explodingBolt}>⚡</button>
+              <button 
+                key={idx} 
+                onClick={gameActive ? () => handleGameBoltClick(idx) : () => handleBoltClick(idx)} 
+                className={`absolute select-none text-2xl transition-transform ${explodingBolt === idx ? 'explode' : 'hover:scale-125'}`} 
+                style={{ top: `${pos.top}%`, left: `${pos.left}%`, transform: `scale(${pos.scale})` }} 
+                aria-label="lightning-bolt" 
+                disabled={!!explodingBolt}
+              >
+                ⚡
+              </button>
             ))}
             {gameActive && (<div className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm rounded-md px-3 py-1 text-sm font-medium">남은 시간: {timeLeft}s · 점수: {score}</div>)}
             {gameOverInfo && (
@@ -335,8 +325,14 @@ const Weather = () => {
 
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
-          <AlertDialogHeader><AlertDialogTitle>Lightning Pop 게임을 시작할까요?</AlertDialogTitle><AlertDialogDescription>15초 동안 번개를 최대한 많이 클릭해보세요!</AlertDialogDescription></AlertDialogHeader>
-          <AlertDialogFooter><AlertDialogCancel>취소</AlertDialogCancel><AlertDialogAction onClick={startGame}>시작하기</AlertDialogAction></AlertDialogFooter>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Lightning Pop 게임을 시작할까요?</AlertDialogTitle>
+            <AlertDialogDescription>15초 동안 번개를 최대한 많이 클릭해보세요!</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>취소</AlertDialogCancel>
+            <AlertDialogAction onClick={startGame}>시작하기</AlertDialogAction>
+          </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </div>

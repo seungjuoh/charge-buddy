@@ -59,7 +59,7 @@ const App = () => {
                     <header className="bg-background shadow-sm border-b px-4 py-3">
                       <div className="flex items-center justify-between max-w-md mx-auto">
                         <div className="flex items-center gap-2">
-                          <Zap className="w-6 h-6 text-blue-600" />
+                          <Zap className="w-6 h-6 text-blue-500 dark:text-green-500" />
                           <span className="font-semibold text-foreground">전기차 충전 AI 비서</span>
                         </div>
                         <div className="flex items-center gap-2">

@@ -127,6 +127,7 @@ export const ChargingRateWidget = () => {
             // 날짜를 상대적인 시간으로 변환하는 함수
             const getRelativeTime = (dateStr: string) => {
               if (!dateStr) return '정보 없음';
+              
               const date = new Date(dateStr);
               const now = new Date('2025-08-12');
               const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
@@ -270,20 +271,20 @@ export const ChargingRateWidget = () => {
     const baseClasses = "h-4 w-4";
     switch (trend) {
       case "up":
-        return <TrendingUp className={`${baseClasses} ${isDarkMode ? 'text-red-400' : 'text-red-500'}`} />;
+        return <TrendingUp className={`${baseClasses} text-red-500 dark:text-red-500`} />;
       case "down":
-        return <TrendingDown className={`${baseClasses} ${isDarkMode ? 'text-blue-400' : 'text-green-500'}`} />;
+        return <TrendingDown className={`${baseClasses} text-blue-500 dark:text-green-500`} />;
       default:
-        return <span className={`${baseClasses} ${isDarkMode ? 'text-gray-400' : 'text-muted-foreground'}`}>—</span>;
-    }
-  };
+        return <span className={`${baseClasses} text-blue-500 dark:text-green-500`}>—</span>;
+  }
+};
 
   const getTrendColor = (trend: string) => {
     switch (trend) {
       case "up":
         return isDarkMode ? "text-red-400" : "text-red-600";
       case "down":
-        return isDarkMode ? "text-blue-400" : "text-blue-600";
+        return isDarkMode ? "text-green-400" : "text-blue-600";
       default:
         return isDarkMode ? "text-gray-400" : "text-muted-foreground";
     }
@@ -345,7 +346,7 @@ export const ChargingRateWidget = () => {
     return (
       <Card className="w-full">
         <CardHeader>
-          <CardTitle className={`flex items-center gap-2 ${isDarkMode ? 'text-green-400' : 'text-primary'}`}>
+          <CardTitle className={`flex items-center gap-2 ${isDarkMode ? 'text-green-400' : 'text-blue-500'}`}>
             <Zap className="h-5 w-5" />
             실시간 충전 요금 비교
           </CardTitle>
@@ -366,7 +367,7 @@ export const ChargingRateWidget = () => {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className={`flex items-center gap-2 text-xl md:text-2xl font-bold ${isDarkMode ? 'text-green-400' : 'text-primary'}`}>
+        <CardTitle className={`flex items-center gap-2 text-xl md:text-2xl font-bold ${isDarkMode ? 'text-green-400' : 'text-blue-500'}`}>
           <Zap className="h-6 w-6 md:h-7 md:w-7" />
           실시간 충전 요금 비교
         </CardTitle>
@@ -517,7 +518,7 @@ export const ChargingRateWidget = () => {
                     {rate.provider}
                   </span>
                   {startIndex + index === 0 && sortBy === "price_asc" && (
-                    <Badge variant="secondary" className={`text-xs ${isDarkMode ? 'bg-green-600 text-white' : ''}`}>
+                    <Badge variant="secondary" className={`text-xs ${isDarkMode ? 'bg-green-600 text-white' : 'bg-blue-500 text-white'}`}>
                       최저가
                     </Badge>
                   )}

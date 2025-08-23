@@ -33,7 +33,9 @@ const Favorites = () => {
                 자주 이용하는 충전소를 즐겨찾기에 추가해보세요.
               </p>
               <Link to="/">
-                <Button>충전소 찾기</Button>
+                <Button className="bg-theme-button-light dark:bg-theme-button-dark hover:bg-theme-button-light-hover dark:hover:bg-theme-button-dark-hover text-white">
+                  충전소 찾기
+                </Button>
               </Link>
             </div>
           </div>
