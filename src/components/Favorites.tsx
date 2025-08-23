@@ -18,7 +18,7 @@ const Favorites = () => {
             </Button>
           </Link>
           <div className="flex items-center gap-2">
-            <Heart className="h-6 w-6 text-red-500" />
+            <Heart className="h-6 w-6 text-blue-500 fill-blue-500 dark:text-green-500 dark:fill-green-500" />
             <h1 className="text-3xl font-bold">즐겨찾기</h1>
           </div>
         </div>
@@ -33,7 +33,7 @@ const Favorites = () => {
                 자주 이용하는 충전소를 즐겨찾기에 추가해보세요.
               </p>
               <Link to="/">
-                <Button className="bg-theme-button-light dark:bg-theme-button-dark hover:bg-theme-button-light-hover dark:hover:bg-theme-button-dark-hover text-white">
+                <Button className="bg-theme-button-light dark:bg-green-600 hover:bg-theme-button-light-hover dark:hover:bg-green-500 text-white font-bold">
                   충전소 찾기
                 </Button>
               </Link>

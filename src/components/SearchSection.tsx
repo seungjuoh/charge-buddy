@@ -519,10 +519,10 @@ export const SearchSection = ({ onSearch, loading, error }: SearchSectionProps) 
               variant="outline" 
               onClick={handleGPSSearch}
               disabled={loading || geminiLoading}
-              className="px-6"
+              className="px-6 hover:bg-blue-500 hover:text-white dark:hover:bg-green-500 dark:hover:text-white focus:bg-blue-500 focus:text-white dark:focus:bg-green-500 dark:focus:text-white transition-colors"
             >
               <MapPin className="h-4 w-4 mr-2" />
-              {loading || geminiLoading ? "처리 중..." : "주변 찾기"}
+              {loading || geminiLoading ? "처리 중..." : "내 주변"}
             </Button>
           </div>
 

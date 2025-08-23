@@ -103,7 +103,7 @@ const App = () => {
                             <TabsList className="grid w-full grid-cols-4 bg-transparent h-16">
                               <TabsTrigger 
                                 value="search" 
-                                className="flex flex-col gap-1 py-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-600"
+                                className="flex flex-col gap-1 py-2 data-[state=active]:bg-blue-50 dark:data-[state=active]:bg-green-600 data-[state=active]:text-blue-600 dark:data-[state=active]:text-white"
                               >
                                 <MapPin className="w-5 h-5" />
                                 <span className="text-xs">충전소 검색</span>
@@ -111,7 +111,7 @@ const App = () => {
                               
                               <TabsTrigger 
                                 value="favorites" 
-                                className="flex flex-col gap-1 py-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-600"
+                                className="flex flex-col gap-1 py-2 data-[state=active]:bg-blue-50 dark:data-[state=active]:bg-green-600 data-[state=active]:text-blue-600 dark:data-[state=active]:text-white"
                               >
                                 <Heart className="h-6 w-6 text-500" />
                                 <span className="text-xs">즐겨찾기</span>
@@ -119,7 +119,7 @@ const App = () => {
                               
                               <TabsTrigger 
                                 value="ocr" 
-                                className="flex flex-col gap-1 py-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-600"
+                                className="flex flex-col gap-1 py-2 data-[state=active]:bg-blue-50 dark:data-[state=active]:bg-green-600 data-[state=active]:text-blue-600 dark:data-[state=active]:text-white"
                               >
                                 <Camera className="w-5 h-5" />
                                 <span className="text-xs">OCR 스캔</span>
@@ -127,7 +127,7 @@ const App = () => {
                               
                               <TabsTrigger 
                                 value="chart" 
-                                className="flex flex-col gap-1 py-2 data-[state=active]:bg-blue-50 data-[state=active]:text-blue-600"
+                                className="flex flex-col gap-1 py-2 data-[state=active]:bg-blue-50 dark:data-[state=active]:bg-green-600 data-[state=active]:text-blue-600 dark:data-[state=active]:text-white"
                               >
                                 <TrendingUp className="w-5 h-5" />
                                 <span className="text-xs">시세 정보</span>
