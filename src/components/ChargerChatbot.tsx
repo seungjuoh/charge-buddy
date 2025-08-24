@@ -1,14 +1,22 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Upload, MessageCircle, Camera, Loader2, X } from "lucide-react";
+import { Upload, MessageCircle, Camera, Loader2, X, MapPin, Clock, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+interface LocationData {
+  latitude: number;
+  longitude: number;
+  address?: string;
+}
 
 interface AnalysisResult {
   extractedText: string;
   solution: string;
+  location?: LocationData;
+  captureDate?: string;
 }
 
 export const ChargerChatbot = () => {
@@ -16,7 +24,62 @@ export const ChargerChatbot = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  const [location, setLocation] = useState<LocationData | null>(null);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
   const { toast } = useToast();
+
+  // Get user location when component mounts
+  useEffect(() => {
+    if (isOpen && !location) {
+      getCurrentLocation();
+    }
+  }, [isOpen]);
+
+  const getCurrentLocation = async () => {
+    setIsGettingLocation(true);
+    try {
+      if (!navigator.geolocation) {
+        throw new Error('GPS를 지원하지 않는 브라우저입니다.');
+      }
+
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000
+        });
+      });
+
+      const { latitude, longitude } = position.coords;
+      
+      // Try to get address from coordinates (reverse geocoding)
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=ko`
+        );
+        const data = await response.json();
+        const address = data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+        
+        setLocation({ latitude, longitude, address });
+      } catch {
+        setLocation({ latitude, longitude });
+      }
+
+      toast({
+        title: "위치 확인 완료",
+        description: "현재 위치를 확인했습니다.",
+      });
+    } catch (error) {
+      console.error('Location error:', error);
+      toast({
+        title: "위치 확인 실패",
+        description: "GPS 권한을 허용해주세요.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGettingLocation(false);
+    }
+  };
 
   const handleImageSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -43,6 +106,14 @@ export const ChargerChatbot = () => {
 
   const analyzeImage = async () => {
     if (!selectedImage) return;
+
+    const captureDate = new Date().toLocaleString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
 
     setIsAnalyzing(true);
     try {
@@ -98,6 +169,8 @@ Format your response in a clear, user-friendly way with:
       setResult({
         extractedText,
         solution,
+        location,
+        captureDate,
       });
       
       toast({
@@ -116,9 +189,28 @@ Format your response in a clear, user-friendly way with:
     }
   };
 
+  const reportMalfunction = () => {
+    if (!result) return;
+
+    const reportData = {
+      extractedText: result.extractedText,
+      solution: result.solution,
+      location: result.location,
+      captureDate: result.captureDate,
+    };
+
+    console.log('고장 신고 데이터:', reportData);
+    
+    toast({
+      title: "고장 신고 완료",
+      description: "충전기 고장이 신고되었습니다.",
+    });
+  };
+
   const reset = () => {
     setSelectedImage(null);
     setResult(null);
+    setLocation(null);
   };
 
   return (
@@ -140,6 +232,38 @@ Format your response in a clear, user-friendly way with:
               충전기 오류 해결 도우미
             </DialogTitle>
           </DialogHeader>
+
+          {/* Location and Date Info */}
+          <div className="flex flex-col gap-2 p-3 bg-muted/50 rounded-lg">
+            <div className="flex items-center gap-2 text-sm">
+              <MapPin className="h-4 w-4 text-muted-foreground" />
+              <span className="text-muted-foreground">현재 위치:</span>
+              {isGettingLocation ? (
+                <span className="text-muted-foreground">위치 확인 중...</span>
+              ) : location ? (
+                <span className="text-foreground truncate">
+                  {location.address || `${location.latitude.toFixed(6)}, ${location.longitude.toFixed(6)}`}
+                </span>
+              ) : (
+                <Button variant="outline" size="sm" onClick={getCurrentLocation}>
+                  위치 허용
+                </Button>
+              )}
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <span className="text-muted-foreground">촬영 시간:</span>
+              <span className="text-foreground">
+                {new Date().toLocaleString('ko-KR', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </span>
+            </div>
+          </div>
 
           <div className="space-y-4">
             {!selectedImage && !result && (
@@ -241,6 +365,42 @@ Format your response in a clear, user-friendly way with:
                         {result.solution}
                       </pre>
                     </div>
+                  </CardContent>
+                </Card>
+
+                {/* Report Section */}
+                <Card className="border-destructive/20 bg-destructive/5">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-sm flex items-center gap-2 text-destructive">
+                      <AlertTriangle className="h-4 w-4" />
+                      충전기 고장 신고
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {result.location && (
+                      <div className="text-xs text-muted-foreground space-y-1">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-3 w-3" />
+                          <span>신고 위치: {result.location.address || `${result.location.latitude.toFixed(6)}, ${result.location.longitude.toFixed(6)}`}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-3 w-3" />
+                          <span>촬영 일시: {result.captureDate}</span>
+                        </div>
+                      </div>
+                    )}
+                    <Button 
+                      variant="destructive" 
+                      size="sm" 
+                      onClick={reportMalfunction}
+                      className="w-full"
+                    >
+                      <AlertTriangle className="h-4 w-4 mr-2" />
+                      충전기 고장 신고하기
+                    </Button>
+                    <p className="text-xs text-muted-foreground">
+                      고장 신고 시 현재 위치와 시간 정보가 함께 전송됩니다.
+                    </p>
                   </CardContent>
                 </Card>
               </div>
