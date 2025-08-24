@@ -17,22 +17,32 @@ export const ThemeToggle = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="h-9 w-9"
+          className="h-9 w-9 rounded-full
+            hover:bg-blue-500 hover:text-white
+            dark:hover:bg-green-500 dark:hover:text-white"
           aria-label="테마 설정"
         >
           <Palette className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="z-50 bg-popover">
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={() => setTheme("light")}
-          className={theme === "light" ? "bg-accent" : ""}
+          className={`
+            hover:bg-blue-500 hover:text-white
+            dark:hover:bg-green-500 dark:hover:text-white
+            ${theme === "light" ? "bg-blue-500 text-white dark:bg-blue-500" : ""}
+          `}
         >
           Light
         </DropdownMenuItem>
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={() => setTheme("dark")}
-          className={theme === "dark" ? "bg-accent" : ""}
+          className={`
+            hover:bg-blue-500 hover:text-white
+            dark:hover:bg-green-500 dark:hover:text-white
+            ${theme === "dark" ? "bg-green-500 text-white dark:bg-green-500" : ""}
+          `}
         >
           Dark
         </DropdownMenuItem>
