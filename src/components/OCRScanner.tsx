@@ -1,3 +1,4 @@
+'use client';
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -262,6 +263,9 @@ export const OCRScanner = () => {
     };
     input.click();
   };
+  const handleVehicleInput = () => {
+  setShowVehicleSelector(true);
+};
 
   const handleVehicleSelection = () => {
     if (!selectedManufacturer || !selectedModel || !selectedYear || !plateNumber.trim()) {
