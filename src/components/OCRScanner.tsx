@@ -668,7 +668,7 @@ export const OCRScanner = () => {
             <CardContent>
               <Button 
                 variant="outline"
-                onClick={() => setShowVehicleSelector(true)}
+                onClick={handleVehicleInput}
                 disabled={isScanning || showVehicleSelector}
                 className="w-full flex items-center gap-2 bg-blue-500 hover:bg-blue-600 dark:bg-green-500 dark:hover:bg-green-600 text-white dark:text-black border-transparent"
               >
