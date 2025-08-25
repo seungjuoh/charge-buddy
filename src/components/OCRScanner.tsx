@@ -593,14 +593,6 @@ export const OCRScanner = () => {
       </CardContent>
     </Card>
   );
-            충전 기록이 가계부에 자동으로 저장되었습니다.
-          </AlertDescription>
-        </Alert>
-        <Button className="w-full">가계부에서 확인</Button>
-      </CardContent>
-    </Card>
-  );
-
   return (
     <div className="space-y-4">
       <div className="text-center mb-6">
@@ -673,7 +665,7 @@ export const OCRScanner = () => {
                 차량 정보 등록
               </CardTitle>
               <p className="text-sm text-muted-foreground">
-                차량 정보를 직접 입력하거나 이미지를 업로드하여 차량을 등록하세요.
+                차량 정보를 직접 입력하세요.
               </p>
             </CardHeader>
             <CardContent>
