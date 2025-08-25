@@ -66,7 +66,13 @@ const App = () => {
                           <ThemeToggle />
                           <Sheet>
                             <SheetTrigger asChild>
-                              <Button variant="ghost" size="sm">
+                              {/* ▼▼▼ 이 Button 부분을 수정했습니다. ▼▼▼ */}
+                              <Button
+                                size="sm"
+                                className="rounded-full w-9 h-9 bg-transparent text-foreground
+                                           hover:bg-blue-500 hover:text-white 
+                                           dark:hover:bg-green-500 dark:hover:text-white"
+                              >
                                 <Menu className="w-5 h-5" />
                               </Button>
                             </SheetTrigger>

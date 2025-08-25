@@ -178,3 +178,21 @@ select {
 .dark select {
   scrollbar-color: #4b5563 #374151;
 }
+
+
+/* 햄버거 메뉴 버튼을 위한 커스텀 클래스 */
+.hamburger-trigger {
+  /* Tailwind의 @apply를 사용해 기존 유틸리티 스타일을 적용합니다. */
+  /* 기본 상태: 투명 배경, 테마에 맞는 아이콘 색상, 둥근 모양 */
+  @apply bg-transparent text-foreground rounded-full;
+}
+
+/* 라이트 모드: 호버 & 포커스 시 파란색 배경 */
+.hamburger-trigger:hover, .hamburger-trigger:focus-visible {
+  @apply bg-blue-500 text-white;
+}
+
+/* 다크 모드: 호버 & 포커스 시 녹색 배경 */
+.dark .hamburger-trigger:hover, .dark .hamburger-trigger:focus-visible {
+  @apply bg-green-500 text-white;
+}

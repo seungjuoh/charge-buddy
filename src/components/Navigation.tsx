@@ -11,7 +11,14 @@ export const Navigation = () => {
         <div className="flex items-center justify-start h-16">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="메뉴 열기">
+              {/* ▼▼▼ 이 Button 부분을 수정했습니다. ▼▼▼ */}
+              <Button
+                size="icon"
+                aria-label="메뉴 열기"
+                className="rounded-full bg-transparent text-foreground 
+                           hover:bg-blue-500 hover:text-white 
+                           dark:hover:bg-green-500 dark:hover:text-white"
+              >
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>

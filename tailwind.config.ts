@@ -52,16 +52,20 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        'theme-button': {
-          light: {
-            DEFAULT: '#3B82F6',    // blue-500
-            hover: '#2563EB',      // blue-600
-          },
-          dark: {
-            DEFAULT: '#22C55E',    // green-500
-            hover: '#16A34A',      // green-600
-          }
-        },
+        // 'theme-button': {
+        //   light: {
+        //     DEFAULT: '#3B82F6',    // blue-500
+        //     hover: '#2563EB',      // blue-600
+        //   },
+        //   dark: {
+        //     DEFAULT: '#22C55E',    // green-500
+        //     hover: '#16A34A',      // green-600
+        //   }
+        // },
+          'theme-light': '#3B82F6',         // 기본: blue-500
+          'theme-light-hover': '#2563EB',  // 호버: blue-600
+          'theme-dark': '#22C55E',          // 기본: green-500
+          'theme-dark-hover': '#16A34A',   // 호버: green-600
       },
       borderRadius: {
         lg: "var(--radius)",

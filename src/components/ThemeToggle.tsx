@@ -26,22 +26,22 @@ export const ThemeToggle = () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="z-50 bg-popover">
-        <DropdownMenuItem
+        <DropdownMenuItem 
           onClick={() => setTheme("light")}
           className={`
-            hover:bg-blue-500 hover:text-white
-            dark:hover:bg-green-500 dark:hover:text-white
-            ${theme === "light" ? "bg-blue-500 text-white dark:bg-blue-500" : ""}
+            focus:bg-blue-500 focus:text-white 
+            dark:focus:bg-green-500 dark:focus:text-white
+            ${theme === "light" ? "bg-blue-500 text-white" : ""}
           `}
         >
           Light
         </DropdownMenuItem>
-        <DropdownMenuItem
+        <DropdownMenuItem 
           onClick={() => setTheme("dark")}
           className={`
-            hover:bg-blue-500 hover:text-white
-            dark:hover:bg-green-500 dark:hover:text-white
-            ${theme === "dark" ? "bg-green-500 text-white dark:bg-green-500" : ""}
+            focus:bg-blue-500 focus:text-white 
+            dark:focus:bg-green-500 dark:focus:text-white
+            ${theme === "dark" ? "bg-green-500 text-white" : ""}
           `}
         >
           Dark
