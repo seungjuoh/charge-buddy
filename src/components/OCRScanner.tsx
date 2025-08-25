@@ -137,32 +137,53 @@ export const OCRScanner = () => {
   const [plateNumber, setPlateNumber] = useState('');
 
   const handleFileUpload = (type: 'equipment' | 'vehicle' | 'receipt') => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = async () => {
-      if (input.files?.[0]) {
-        if (type === 'vehicle') {
-          // 차량 정보의 경우 파일 업로드 대신 차량 선택기 표시
-          setShowVehicleSelector(true);
-        } else {
-          // 다른 타입은 기존 로직 유지
-          setIsScanning(true);
-          setOCRResult(null);
-          
-          setTimeout(() => {
-            setOCRResult({
-              type,
-              data: mockOCRResults[type],
-              confidence: 0.95
-            });
-            setIsScanning(false);
-          }, 2000);
+    if (type === 'vehicle') {
+    // 차량 등록은 파일 업로드 대신 차량 선택창 표시
+    setShowVehicleSelector(true);
+    return; // 여기서 함수 끝내버림
+  }
+ // 파일 업로드 input 생성 (equipment, receipt 전용)
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = async () => {
+    if (input.files?.[0]) {
+      setIsScanning(true);
+      setOCRResult(null);
+
+      if (type === 'receipt') {
+        // 📌 OCR 엔진으로 실제 분석
+        try {
+          const { data } = await Tesseract.recognize(input.files[0], 'kor+eng');
+          setOCRResult({
+            type: 'receipt',
+            data: {
+              rawText: data.text, // OCR 전체 텍스트 저장
+              chargeAmount: parseInt(data.text.match(/\d{3,6}\s*원/)?.[0]?.replace(/\D/g, '') || '0'),
+              paymentMethod: data.text.includes('카드') ? '카드' : '기타',
+            },
+            confidence: data.confidence / 100,
+          });
+        } catch (err) {
+          console.error(err);
+        } finally {
+          setIsScanning(false);
         }
+      } else {
+        // equipment → 기존 mock 데이터
+        setTimeout(() => {
+          setOCRResult({
+            type,
+            data: mockOCRResults[type],
+            confidence: 0.95,
+          });
+          setIsScanning(false);
+        }, 2000);
       }
-    };
-    input.click();
+    }
   };
+  input.click();
+};
 
   const handleVehicleSelection = () => {
     if (!selectedManufacturer || !selectedModel || !selectedYear || !plateNumber.trim()) {
