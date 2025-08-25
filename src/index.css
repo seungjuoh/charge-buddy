@@ -34,7 +34,7 @@ All colors MUST be HSL.
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 142 76% 36%;
+    --ring: 217 91% 60%;
 
     --success: 142 76% 36%;
     --success-foreground: 0 0% 98%;
@@ -126,4 +126,55 @@ All colors MUST be HSL.
 
 .explode {
   animation: explode 0.3s ease-out forwards;
+}
+
+/* 현대적인 select 옵션 스타일링 */
+select option {
+  padding: 12px 16px;
+  background-color: white;
+  color: #374151;
+  font-weight: 500;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+/* 다크 테마 옵션 */
+.dark select option {
+  background-color: #1f2937;
+  color: #d1d5db;
+}
+
+/* 호버 효과 - 일반 테마 (블루) */
+select option:hover {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+
+/* 호버 효과 - 다크 테마 (그린) */
+.dark select option:hover {
+  background-color: #064e3b;
+  color: #34d399;
+}
+
+/* 선택된 옵션 스타일 */
+select option:checked {
+  background-color: #3b82f6;
+  color: white;
+  font-weight: 600;
+}
+
+.dark select option:checked {
+  background-color: #10b981;
+  color: white;
+}
+
+/* 옵션 리스트 전체 스타일링 */
+select {
+  /* 기존 스타일 유지하면서 추가 */
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.dark select {
+  scrollbar-color: #4b5563 #374151;
 }
