@@ -120,6 +120,71 @@ const mockOCRResults = {
   }
 };
 
+// OCR에서 영수증 정보 추출하는 함수
+const extractReceiptData = (text: string): ReceiptData => {
+  const data: ReceiptData = {};
+  
+  // 충전 금액 추출 (원 단위)
+  const amountMatch = text.match(/(\d{1,3}(?:,\d{3})*)\s*원/);
+  if (amountMatch) {
+    data.chargeAmount = parseInt(amountMatch[1].replace(/,/g, ''));
+  }
+  
+  // 충전량 추출 (kWh 단위)
+  const energyMatch = text.match(/(\d+(?:\.\d+)?)\s*kWh/i);
+  if (energyMatch) {
+    data.energyCharged = energyMatch[1] + 'kWh';
+  }
+  
+  // 충전 시간 추출
+  const durationMatch = text.match(/(\d+)\s*시간?\s*(\d+)?\s*분?/);
+  if (durationMatch) {
+    const hours = durationMatch[1];
+    const minutes = durationMatch[2] || '0';
+    data.chargeDuration = `${hours}시간 ${minutes}분`;
+  }
+  
+  // 결제 방법 추출
+  if (text.includes('카드') || text.includes('신용카드') || text.includes('체크카드')) {
+    data.paymentMethod = '카드';
+  } else if (text.includes('현금')) {
+    data.paymentMethod = '현금';
+  }
+  
+  // 충전기 타입 추출
+  if (text.includes('급속') || text.includes('DC')) {
+    data.chargerType = 'DC 급속충전';
+  } else if (text.includes('완속') || text.includes('AC')) {
+    data.chargerType = 'AC 완속충전';
+  }
+  
+  // 충전 요금 (원/kWh) 추출
+  const rateMatch = text.match(/(\d+(?:\.\d+)?)\s*원\s*\/\s*kWh/i);
+  if (rateMatch) {
+    data.chargingRate = rateMatch[1] + '원/kWh';
+  }
+  
+  // 위치/충전소명 추출 (보통 상단에 위치)
+  const lines = text.split('\n').filter(line => line.trim());
+  for (let i = 0; i < Math.min(5, lines.length); i++) {
+    const line = lines[i].trim();
+    if (line.length > 3 && !line.match(/^\d+$/) && line.includes('충전')) {
+      data.location = line;
+      break;
+    }
+  }
+  
+  // 시간 정보 추출 (시작/종료)
+  const timePattern = /(\d{4}[-\/]\d{2}[-\/]\d{2}\s+\d{2}:\d{2})/g;
+  const timeMatches = text.match(timePattern);
+  if (timeMatches && timeMatches.length >= 2) {
+    data.chargeStartTime = timeMatches[0];
+    data.chargeEndTime = timeMatches[1];
+  }
+  
+  return data;
+};
+
 export const OCRScanner = () => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -136,54 +201,67 @@ export const OCRScanner = () => {
   const [selectedYear, setSelectedYear] = useState('');
   const [plateNumber, setPlateNumber] = useState('');
 
-  const handleFileUpload = (type: 'equipment' | 'vehicle' | 'receipt') => {
-    if (type === 'vehicle') {
-    // 차량 등록은 파일 업로드 대신 차량 선택창 표시
-    setShowVehicleSelector(true);
-    return; // 여기서 함수 끝내버림
-  }
- // 파일 업로드 input 생성 (equipment, receipt 전용)
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
-  input.onchange = async () => {
-    if (input.files?.[0]) {
-      setIsScanning(true);
-      setOCRResult(null);
+  const handleFileUpload = (type: 'equipment' | 'receipt') => {
+    // 파일 업로드 input 생성 (equipment, receipt 전용)
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async () => {
+      if (input.files?.[0]) {
+        setIsScanning(true);
+        setOCRResult(null);
 
-      if (type === 'receipt') {
-        // 📌 OCR 엔진으로 실제 분석
-        try {
-          const { data } = await Tesseract.recognize(input.files[0], 'kor+eng');
-          setOCRResult({
-            type: 'receipt',
-            data: {
-              rawText: data.text, // OCR 전체 텍스트 저장
-              chargeAmount: parseInt(data.text.match(/\d{3,6}\s*원/)?.[0]?.replace(/\D/g, '') || '0'),
-              paymentMethod: data.text.includes('카드') ? '카드' : '기타',
-            },
-            confidence: data.confidence / 100,
-          });
-        } catch (err) {
-          console.error(err);
-        } finally {
-          setIsScanning(false);
+        if (type === 'receipt') {
+          // OCR 엔진으로 실제 분석
+          try {
+            const { data } = await Tesseract.recognize(input.files[0], 'kor+eng', {
+              logger: m => console.log(m) // OCR 진행상황 로그
+            });
+            
+            console.log('OCR 원본 텍스트:', data.text);
+            
+            const extractedData = extractReceiptData(data.text);
+            console.log('추출된 데이터:', extractedData);
+            
+            setOCRResult({
+              type: 'receipt',
+              data: {
+                rawText: data.text,
+                ...extractedData
+              },
+              confidence: data.confidence / 100,
+            });
+            
+            toast({
+              title: "영수증 인식 완료",
+              description: "영수증 정보가 성공적으로 추출되었습니다.",
+            });
+            
+          } catch (err) {
+            console.error('OCR 오류:', err);
+            toast({
+              title: "인식 실패",
+              description: "영수증을 인식하지 못했습니다. 다시 시도해주세요.",
+              variant: "destructive"
+            });
+          } finally {
+            setIsScanning(false);
+          }
+        } else {
+          // equipment → 기존 mock 데이터
+          setTimeout(() => {
+            setOCRResult({
+              type,
+              data: mockOCRResults[type],
+              confidence: 0.95,
+            });
+            setIsScanning(false);
+          }, 2000);
         }
-      } else {
-        // equipment → 기존 mock 데이터
-        setTimeout(() => {
-          setOCRResult({
-            type,
-            data: mockOCRResults[type],
-            confidence: 0.95,
-          });
-          setIsScanning(false);
-        }, 2000);
       }
-    }
+    };
+    input.click();
   };
-  input.click();
-};
 
   const handleVehicleSelection = () => {
     if (!selectedManufacturer || !selectedModel || !selectedYear || !plateNumber.trim()) {
@@ -230,7 +308,20 @@ export const OCRScanner = () => {
     setShowVehicleSelector(false);
   };
 
-onClick={() => setShowVehicleSelector(true)}
+  // 차량 선택기 컴포넌트
+  const renderVehicleSelector = () => (
+    <Card className="mt-4">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Car className="w-5 h-5" />
+          차량 정보 입력
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* 차량번호 입력 */}
+        <div className="space-y-2">
+          <Label htmlFor="plateNumber">차량번호</Label>
+          <Input
             id="plateNumber"
             placeholder="예: 12가3456"
             value={plateNumber}
@@ -472,6 +563,17 @@ onClick={() => setShowVehicleSelector(true)}
             </div>
           )}
         </div>
+        
+        {/* OCR 원본 텍스트 (디버깅용 - 필요시 제거 가능) */}
+        {ocrResult?.data.rawText && (
+          <div className="mt-4 p-3 bg-gray-50 rounded text-xs">
+            <details>
+              <summary className="cursor-pointer text-gray-600">OCR 원본 텍스트 보기</summary>
+              <pre className="mt-2 whitespace-pre-wrap text-gray-700">{ocrResult.data.rawText}</pre>
+            </details>
+          </div>
+        )}
+        
         <Alert>
           <CheckCircle className="h-4 w-4" />
           <AlertDescription>
@@ -487,6 +589,7 @@ onClick={() => setShowVehicleSelector(true)}
       </CardContent>
     </Card>
   );
+  
   return (
     <div className="space-y-4">
       <div className="text-center mb-6">
@@ -525,14 +628,14 @@ onClick={() => setShowVehicleSelector(true)}
             </CardContent>
           </Card>
 
-          {isScanning && activeTab === 'receipt' && (
+          {isScanning && activeTab === 'equipment' && (
             <Card className="border-blue-200 bg-blue-50 mt-4">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                   <div>
-                    <p className="font-medium text-blue-900">영수증 OCR 인식 중...</p>
-                    <p className="text-sm text-blue-700">Tesseract.js로 영수증 정보를 추출하고 있습니다</p>
+                    <p className="font-medium text-blue-900">충전기 정보 인식 중...</p>
+                    <p className="text-sm text-blue-700">충전기 ID와 오류 정보를 분석하고 있습니다</p>
                   </div>
                 </div>
               </CardContent>
@@ -613,14 +716,14 @@ onClick={() => setShowVehicleSelector(true)}
             </CardContent>
           </Card>
 
-          {isScanning && (
+          {isScanning && activeTab === 'receipt' && (
             <Card className="border-blue-200 bg-blue-50 mt-4">
               <CardContent className="p-4">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                   <div>
-                    <p className="font-medium text-blue-900">OCR 인식 중...</p>
-                    <p className="text-sm text-blue-700">이미지를 분석하고 있습니다</p>
+                    <p className="font-medium text-blue-900">영수증 OCR 인식 중...</p>
+                    <p className="text-sm text-blue-700">Tesseract.js로 영수증 정보를 추출하고 있습니다</p>
                   </div>
                 </div>
               </CardContent>
