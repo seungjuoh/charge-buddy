@@ -209,134 +209,7 @@ export const OCRScanner = () => {
     setShowVehicleSelector(false);
   };
 
-  // 영수증 OCR 처리 함수
-  const performReceiptOCR = async (imageFile: File): Promise<OCRResult> => {
-    try {
-      console.log('영수증 OCR 시작:', imageFile.name);
-      
-      // Tesseract.js로 OCR 수행 (한국어 + 영어)
-      const { data } = await Tesseract.recognize(imageFile, 'kor+eng', {
-        logger: (m) => {
-          if (m.status === 'recognizing text') {
-            console.log(`영수증 OCR 진행률: ${Math.round(m.progress * 100)}%`);
-          }
-        }
-      });
-
-      console.log('영수증 OCR 완료, 추출된 텍스트:', data.text);
-      
-      // 영수증 정보 추출
-      const receiptData = extractReceiptInfo(data.text);
-      
-      return {
-        type: 'receipt',
-        data: receiptData,
-        confidence: data.confidence / 100
-      };
-      
-    } catch (error) {
-      console.error('영수증 OCR 처리 중 오류:', error);
-      throw error;
-    }
-  };
-
-  // 영수증 텍스트에서 정보 추출
-  const extractReceiptInfo = (text: string): ReceiptData => {
-    console.log('영수증 정보 추출 시작:', text);
-    
-    const receiptData: ReceiptData = {};
-    
-    // 텍스트를 줄 단위로 분리하고 정리
-    const lines = text.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-    
-    for (const line of lines) {
-      // 충전 금액 추출 (원, 원, won 등)
-      const amountMatch = line.match(/(\d{1,3}(?:,\d{3})*)\s*원|(\d{1,3}(?:,\d{3})*)\s*won/i);
-      if (amountMatch && !receiptData.chargeAmount) {
-        const amount = parseInt((amountMatch[1] || amountMatch[2]).replace(/,/g, ''));
-        if (amount > 1000) { // 1000원 이상인 경우만 충전 금액으로 인식
-          receiptData.chargeAmount = amount;
-        }
-      }
-      
-      // 충전량 추출 (kWh, kwh)
-      const energyMatch = line.match(/(\d+\.?\d*)\s*kWh/i);
-      if (energyMatch && !receiptData.energyCharged) {
-        receiptData.energyCharged = `${energyMatch[1]}kWh`;
-      }
-      
-      // 충전 시간 추출 (분)
-      const durationMatch = line.match(/(\d+)\s*분|(\d+)\s*min/i);
-      if (durationMatch && !receiptData.chargeDuration) {
-        receiptData.chargeDuration = `${durationMatch[1] || durationMatch[2]}분`;
-      }
-      
-      // 요금 (원/kWh)
-      const rateMatch = line.match(/(\d+)\s*원\/kWh|(\d+)\s*won\/kWh/i);
-      if (rateMatch && !receiptData.chargingRate) {
-        receiptData.chargingRate = `${rateMatch[1] || rateMatch[2]}원/kWh`;
-      }
-      
-      // 시간 정보 추출 (YYYY-MM-DD HH:MM 형태)
-      const timeMatch = line.match(/(\d{4}[-\/]\d{2}[-\/]\d{2}\s+\d{2}:\d{2})/);
-      if (timeMatch) {
-        if (!receiptData.chargeStartTime) {
-          receiptData.chargeStartTime = timeMatch[1];
-        } else if (!receiptData.chargeEndTime) {
-          receiptData.chargeEndTime = timeMatch[1];
-        }
-      }
-      
-      // 결제 방법
-      if (line.includes('신용카드') || line.includes('카드')) {
-        receiptData.paymentMethod = '신용카드';
-      } else if (line.includes('현금')) {
-        receiptData.paymentMethod = '현금';
-      }
-      
-      // 충전소 위치
-      if (line.includes('충전소') || line.includes('스테이션')) {
-        receiptData.location = line;
-      }
-      
-      // 충전기 타입
-      if (line.includes('급속') || line.includes('DC')) {
-        receiptData.chargerType = '급속충전';
-      } else if (line.includes('완속') || line.includes('AC')) {
-        receiptData.chargerType = '완속충전';
-      }
-    }
-    
-    // 기본값 설정
-    if (!receiptData.paymentMethod) receiptData.paymentMethod = '미확인';
-    if (!receiptData.location) receiptData.location = '위치 정보 없음';
-    if (!receiptData.chargerType) receiptData.chargerType = '미확인';
-    
-    // 시작/종료 시간이 하나만 있는 경우 추정
-    if (receiptData.chargeStartTime && !receiptData.chargeEndTime && receiptData.chargeDuration) {
-      const duration = parseInt(receiptData.chargeDuration);
-      const startTime = new Date(receiptData.chargeStartTime);
-      const endTime = new Date(startTime.getTime() + duration * 60000);
-      receiptData.chargeEndTime = endTime.toISOString().slice(0, 16).replace('T', ' ');
-    }
-    
-    console.log('추출된 영수증 정보:', receiptData);
-    return receiptData;
-  };
-
-  const renderVehicleSelector = () => (
-    <Card className="mt-4 border-blue-200 bg-blue-50">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-blue-700">
-          <Car className="w-5 h-5" />
-          차량 정보 입력
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* 차량번호 입력 */}
-        <div className="space-y-2">
-          <Label htmlFor="plateNumber">차량번호</Label>
-          <Input
+onClick={() => setShowVehicleSelector(true)}
             id="plateNumber"
             placeholder="예: 12가3456"
             value={plateNumber}
@@ -671,7 +544,7 @@ export const OCRScanner = () => {
             <CardContent>
               <Button 
                 variant="outline"
-                onClick={() => handleFileUpload('vehicle')}
+                onClick={() => setShowVehicleSelector(true)}
                 disabled={isScanning || showVehicleSelector}
                 className="w-full flex items-center gap-2 bg-blue-500 hover:bg-blue-600 dark:bg-green-500 dark:hover:bg-green-600 text-white dark:text-black border-transparent"
               >
